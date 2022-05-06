@@ -90,7 +90,8 @@ class MainWindow(QMainWindow):
         infoDialog.setWindowTitle('Dicom tag information')
         infoDialog.show()
         infoDialog.exec()
-    #Display IMG
+
+    #Display IMG FUNCTION in new window
     def displayDicomImgageWindow(self,im):
         Windiw_Image= QLabel()
         Windiw_Image.setPixmap(QPixmap.fromImage(im))
@@ -110,6 +111,7 @@ class MainWindow(QMainWindow):
         self.displayDicomInformation(all_tags)
         self.displayDicomImage(dataset)
     #Display DICOM Img
+
     def displayDicomImage(self, ds):
         # Try turn pixel data into image
         # from https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_PIL.py
