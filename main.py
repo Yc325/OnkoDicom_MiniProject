@@ -1,13 +1,13 @@
 from PySide6.QtWidgets import (QApplication,
-    QLabel,
-    QMainWindow,
-    QPushButton,
-    QWidget,
-    QGridLayout,
-    QMessageBox,
-    QFileDialog,
-    QDialog,
-    QGridLayout)
+                                QLabel,
+                                QMainWindow,
+                                QPushButton,
+                                QWidget,
+                                QGridLayout,
+                                QMessageBox,
+                                QFileDialog,
+                                QDialog,
+                                QGridLayout)
 
 
 from PySide6.QtCore import Qt
@@ -15,7 +15,7 @@ from PySide6.QtGui import QPixmap,QCloseEvent
 import sys
 import pydicom
 import os
-import matplotlib.pyplot as plt
+
 from PIL import Image
 from PIL.ImageQt import ImageQt
 import numpy as np
@@ -72,6 +72,7 @@ class MainWindow(QMainWindow):
             event.accept()
         else:
             event.ignore()
+
     #Window Dicom File
     def browse(self):
         qfd = QFileDialog()
@@ -91,13 +92,12 @@ class MainWindow(QMainWindow):
         infoDialog.show()
         infoDialog.exec()
 
-    #Display IMG FUNCTION in new window
+    #Display img in a new window
     def displayDicomImgageWindow(self,im):
         Windiw_Image= QLabel()
         Windiw_Image.setPixmap(QPixmap.fromImage(im))
         Windiw_Image.show()
         Windiw_Image.exec()
-
 
     #Open File
     def openFileOfItem(self, path):
@@ -110,8 +110,8 @@ class MainWindow(QMainWindow):
 
         self.displayDicomInformation(all_tags)
         self.displayDicomImage(dataset)
-    #Display DICOM Img
 
+    #Display DICOM Img
     def displayDicomImage(self, ds):
         # Try turn pixel data into image
         # from https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_PIL.py
@@ -141,6 +141,3 @@ app = QApplication(sys.argv)
 w = MainWindow()
 w.show()
 app.exec()
-
-print('test')
-print('test')
