@@ -9,3 +9,4 @@ Before run Application
 Install
 pyside6
 pydicom
+matplotlib
