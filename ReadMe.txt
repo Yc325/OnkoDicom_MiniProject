@@ -7,5 +7,8 @@ Applciation is wirtten on pyside6
 
 Before run Application
 Install
-pyside6
-pydicom
+```pip install PySide6```
+```pip install pydicom```
+```pip install matplotlib```
+```pip install Pillow```
+```pip install numpy```
