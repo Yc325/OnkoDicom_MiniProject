@@ -6,4 +6,4 @@ Applciation uses pyside6 for GUI
 pip install -r requirements.txt
 
 **To run:** 
-python main.py
+python src/main.py
