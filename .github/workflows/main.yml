@@ -34,10 +34,10 @@ jobs:
         pytest
     - name: Analysing the code with pylint
       run: |
-        pylint --extension-pkg-whitelist=PyQt6 app.py
+        pylint --extension-pkg-whitelist=PyQt6 src/
     - name: Analyse the code with pycodestyle
       run: |
-        pycodestyle --show-source --show-pep8 app.py
+        pycodestyle --show-source --show-pep8 src/
     - name: Produce pytest-cov report
       run: |
         pytest --cov=src test/
