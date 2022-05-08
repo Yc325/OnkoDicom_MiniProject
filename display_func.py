@@ -28,6 +28,7 @@ from PIL import Image
 from PIL.ImageQt import ImageQt
 import numpy as np
 import icons
+import re
 # Display Dicom File
 """
 Function that creates new window to display Dicom information from choosen file

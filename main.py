@@ -135,22 +135,41 @@ class MainWindow(QMainWindow):
     Function prepare window with all found DICOM files
     """
     def showFiles(self, files):
+
         for fn in files:
             file = QFile(self.currentDir.absoluteFilePath(fn))
             size = QFileInfo(file).size()
 
             fileNameItem = QTableWidgetItem(fn)
+
+            fileNameNumber = (''.join(filter(str.isdigit,fn))) #get number from the name of the file
+
+
+        #For sorting items and adding them to hidden column
+            if 'RT' not in fn:
+                Item_number = QTableWidgetItem()
+                Item_number.setData(Qt.EditRole,int(fileNameNumber))
+                Item_number.setFlags(Item_number.flags() ^ Qt.ItemIsEditable)
+            else:
+                print(fileNameNumber)
+                Item_number = QTableWidgetItem('RT')
+                Item_number.setFlags(Item_number.flags() ^ Qt.ItemIsEditable)
+
+
             fileNameItem.setFlags(fileNameItem.flags() ^ Qt.ItemIsEditable)
             sizeItem = QTableWidgetItem("%d KB" % (int((size + 1023) / 1024))) #Caluclate size
             sizeItem.setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
             sizeItem.setFlags(sizeItem.flags() ^ Qt.ItemIsEditable)
 
+
             row = self.filesTable.rowCount()
             self.filesTable.insertRow(row)
             self.filesTable.setItem(row, 0, fileNameItem)
             self.filesTable.setItem(row, 1, sizeItem)
+            self.filesTable.setItem(row, 2, Item_number) #insert row of file number
 
         self.filesFoundLabel.setText("%d file(s) found (Double click on a file to open it)" % len(files))
+        self.filesTable.sortItems(2, order=Qt.AscendingOrder)
 
     def createButton(self, text, member):
         button = QPushButton(text)
@@ -166,11 +185,12 @@ class MainWindow(QMainWindow):
         return comboBox
 
     def createFilesTable(self):
-        self.filesTable = QTableWidget(0, 2)
+        self.filesTable = QTableWidget(0, 3)
         self.filesTable.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.filesTable.setHorizontalHeaderLabels(("File Name", "Size"))
+        self.filesTable.setHorizontalHeaderLabels(("File Name", "Size",None))
         self.filesTable.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
         self.filesTable.verticalHeader().hide()
+        self.filesTable.hideColumn(2) #hide column
         self.filesTable.setShowGrid(False)
         self.filesTable.cellActivated.connect(self.openFileOfItem)
 
