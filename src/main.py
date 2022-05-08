@@ -1,25 +1,9 @@
 #import Libraries
-from PySide6.QtWidgets import (QApplication,
-                                QLabel,
-                                QMainWindow,
-                                QPushButton,
-                                QWidget,
-                                QGridLayout,
-                                QMessageBox,
-                                QFileDialog,
-                                QDialog,
-                                QGridLayout)
 
-from PySide6.QtCore import Qt
-from PySide6.QtGui import QPixmap, QCloseEvent
-import sys
-import pydicom
-import os
+#Some of the functions is used from open sourced code
+#link https://amirkoblog.wordpress.com/2018/07/26/using-pyside2-and-pydicom-to-display-dicom-header-information/
 
-from PIL import Image
-from PIL.ImageQt import ImageQt
-import numpy as np
-
+from display_func import *
 
 
 class MainWindow(QMainWindow):
@@ -27,22 +11,18 @@ class MainWindow(QMainWindow):
 
     def __init__(self):
         super().__init__()
-        self.w = None  # No external window yet.
-
+        self.w = True  # No external window yet.
         #set window Title
         self.setWindowTitle('OnkoDicom')
         #Create 2 Buttons
         button_suc = QPushButton("Open Dicom File")
         button_close = QPushButton("Force Quit",self)
         #Assign Buttons
-        button_suc.clicked.connect(self.browse)
+        button_suc.clicked.connect(self.Window_to_browse_DICOM_files)
         button_close.clicked.connect(QApplication.instance().quit)
 
         label = QLabel("InkoDICOM")
         label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)  # set aligment
-
-        #Make IMG for DICOM FILE
-        self.image_label = QLabel()
 
         #Create LOGO of DICOM
         pixmap = QPixmap('img/logo.png')
@@ -54,7 +34,6 @@ class MainWindow(QMainWindow):
         layout.addWidget(label, 0, 0, 3, 5, Qt.AlignCenter ) #Add label
         layout.addWidget(button_suc, 3, 0) #Add button
         layout.addWidget(button_close, 3, 4) #Add button
-        layout.addWidget(self.image_label,5,0,3,5,Qt.AlignCenter)  #Add IMG of DICOM FILES
 
         #Create Container and add layout to it.
         container = QWidget()
@@ -86,49 +65,144 @@ class MainWindow(QMainWindow):
     """
     Function that allows you to  open Directory of your PC and choose DICOM File
     """
+    def Window_to_browse_DICOM_files(self):
+        self.browseButton = self.createButton("&Browse...", self.browse) #Bar where you can type Path
+        self.directoryComboBox = self.createComboBox(QDir.currentPath()) #Display current path
+
+        directoryLabel = QLabel("In directory:")
+        self.filesFoundLabel = QLabel()
+
+        self.createFilesTable()
+
+        buttonsLayout = QHBoxLayout()
+        buttonsLayout.addStretch()
+
+        #Create GRID LAYOUT
+        mainLayout = QGridLayout()
+        mainLayout.addWidget(directoryLabel, 2, 0)
+        mainLayout.addWidget(self.directoryComboBox, 2, 1)
+        mainLayout.addWidget(self.browseButton, 2, 2)
+        mainLayout.addWidget(self.filesTable, 3, 0, 1, 3)
+        mainLayout.addWidget(self.filesFoundLabel, 4, 0)
+        mainLayout.addLayout(buttonsLayout, 5, 0, 1, 3)
+
+
+        container = QWidget()
+        container.setLayout(mainLayout)
+        self.setWindowTitle("Explore DICOM Files")
+        self.resize(1200, 800)
+        self.setCentralWidget(container)
+
+    """
+    Function Browse:
+    Open Directory and allow you to choose Folder with DICOM format Files
+    Then Function is looking for DICOM FILES by calling function "find()"
+    """
     def browse(self):
-        qfd = QFileDialog() #File Dialog
-        path = os.getcwd() #pick the current Directory of the File
-        filter = "dcm(*.dcm)"   #set condition to choose only Dicom files
-        f = QFileDialog.getOpenFileName(qfd,'Open dcm File', path, filter) #Premade functon to get the path of the chosen directory
+        directory = QFileDialog.getExistingDirectory(self, "Find Files",
+                                                               QDir.currentPath())
 
-        self.openFileOfItem(f[0]) #pick the chosen directory
+        if directory:
+            if self.directoryComboBox.findText(directory) == -1:
+                self.directoryComboBox.addItem(directory)
 
-    #Display Dicom File
-    """
-    Function that creates new window to display Dicom information from choosen file
-    The input of the function takes msg of the DICOM file and create it in new Window
-    Basically it just GUI functions that creates new window with msg
-    """
-    def displayDicomInformation(self, msg):
-        infoDialog = QDialog()
-        layout = QGridLayout(infoDialog)
-        layout.addWidget(QLabel(msg))
-        infoDialog.setLayout(layout)
-        infoDialog.setWindowTitle('Dicom tag information')
-        infoDialog.show()
-        infoDialog.exec()
+            self.directoryComboBox.setCurrentIndex(self.directoryComboBox.findText(directory))
+            self.find()
 
-    #Display img in a new window
-    """
-    Function that creates new window to display Dicom IMG from chosen file
-    The input of the function takes IMG of the DICOM file and create it in new Window
-    Basically it just GUI functions that creates new window with IMG
-    """
-    def displayDicomImgageWindow(self,im):
-        Windiw_Image= QLabel()
-        Windiw_Image.setPixmap(QPixmap.fromImage(im))
-        Windiw_Image.show()
-        Windiw_Image.exec()
+    @staticmethod
+    def updateComboBox(comboBox):
+        if comboBox.findText(comboBox.currentText()) == -1:
+            comboBox.addItem(comboBox.currentText())
 
     """
-    Function that take input of the chosen path and create proper msg from the DICOM file
-    Then it calls function "displayDicomInformation" with prepared msg
-    That function contains function "displayDicomImage" it takes DICOM file as input
-    and prepare IMG
+    Function is looking for all dcm files in a folder
     """
-    #Open File
-    def openFileOfItem(self, path):
+    def find(self):
+        self.filesTable.setRowCount(0)
+
+        path = self.directoryComboBox.currentText()
+
+        self.updateComboBox(self.directoryComboBox)
+
+        self.currentDir = QDir(path)
+        fileName = "*.dcm"
+        files = self.currentDir.entryList([fileName],
+                                          QDir.Files | QDir.NoSymLinks)
+
+        self.showFiles(files)
+
+    """
+    Function prepare window with all found DICOM files
+    """
+    def showFiles(self, files):
+
+        for fn in files:
+            file = QFile(self.currentDir.absoluteFilePath(fn))
+            size = QFileInfo(file).size()
+
+            fileNameItem = QTableWidgetItem(fn)
+
+            fileNameNumber = (''.join(filter(str.isdigit,fn))) #get number from the name of the file
+
+
+        #For sorting items and adding them to hidden column
+            if 'RT' not in fn:
+                Item_number = QTableWidgetItem()
+                Item_number.setData(Qt.EditRole,int(fileNameNumber))
+                Item_number.setFlags(Item_number.flags() ^ Qt.ItemIsEditable)
+            else:
+                print(fileNameNumber)
+                Item_number = QTableWidgetItem('RT')
+                Item_number.setFlags(Item_number.flags() ^ Qt.ItemIsEditable)
+
+
+            fileNameItem.setFlags(fileNameItem.flags() ^ Qt.ItemIsEditable)
+            sizeItem = QTableWidgetItem("%d KB" % (int((size + 1023) / 1024))) #Caluclate size
+            sizeItem.setTextAlignment(Qt.AlignVCenter | Qt.AlignRight)
+            sizeItem.setFlags(sizeItem.flags() ^ Qt.ItemIsEditable)
+
+
+            row = self.filesTable.rowCount()
+            self.filesTable.insertRow(row)
+            self.filesTable.setItem(row, 0, fileNameItem)
+            self.filesTable.setItem(row, 1, sizeItem)
+            self.filesTable.setItem(row, 2, Item_number) #insert row of file number
+
+        self.filesFoundLabel.setText("%d file(s) found (Double click on a file to open it)" % len(files))
+        self.filesTable.sortItems(2, order=Qt.AscendingOrder)
+
+    def createButton(self, text, member):
+        button = QPushButton(text)
+        button.clicked.connect(member)
+        return button
+
+    def createComboBox(self, text=""):
+        comboBox = QComboBox()
+        comboBox.setEditable(True)
+        comboBox.addItem(text)
+        comboBox.setSizePolicy(QSizePolicy.Expanding,
+                               QSizePolicy.Preferred)
+        return comboBox
+
+    def createFilesTable(self):
+        self.filesTable = QTableWidget(0, 3)
+        self.filesTable.setSelectionBehavior(QAbstractItemView.SelectRows)
+        self.filesTable.setHorizontalHeaderLabels(("File Name", "Size",None))
+        self.filesTable.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.filesTable.verticalHeader().hide()
+        self.filesTable.hideColumn(2) #hide column
+        self.filesTable.setShowGrid(False)
+        self.filesTable.cellActivated.connect(self.openFileOfItem)
+
+    """
+    Function opens choosen file and call function to disaply this file in
+    a new window
+    """
+
+    #Open Chosen file
+    def openFileOfItem(self, row, column):
+        item = self.filesTable.item(row, 0)
+        path = self.directoryComboBox.currentText() + "/" + item.text()
         dataset = pydicom.dcmread(path)
 
         all_tags = ''
@@ -136,38 +210,7 @@ class MainWindow(QMainWindow):
             tag = str(elem) + '\n'
             all_tags += tag
 
-        self.displayDicomInformation(all_tags) #Show the msg in a new window
-        self.displayDicomImage(dataset) #Takes DICOM File
-
-    #Display DICOM Img
-    """"
-    Function that prepare DICOM FILE to be Displayed
-    """
-    def displayDicomImage(self, ds):
-        # Try turn pixel data into image
-        # from https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_PIL.py
-        ew = ds['WindowWidth']  #it takes value from DICOM FILE that has key 'WindowWidth'
-        ec = ds['WindowCenter'] #it takes value from DICOM FILE that has key 'WindowCenter'
-        ww = int(ew.value[0] if ew.VM > 1 else ew.value)
-        wc = int(ec.value[0] if ec.VM > 1 else ec.value)
-        #Takes Data Value if IMG (pixels)
-        data = ds.pixel_array
-        window = ww
-        level = wc
-        #using numpy library
-        image = np.piecewise(data,
-                             [data <= (level - 0.5 - (window - 1) / 2),
-                              data > (level - 0.5 + (window - 1) / 2)],
-                             [0, 255, lambda data: ((data - (level - 0.5)) /
-                                                    (window - 1) + 0.5) * (255 - 0)])
-        #Using PIL library
-        im = Image.fromarray(image).convert('L')
-        # Using PIL library
-        im = ImageQt(im)
-
-        self.image_label.setPixmap(QPixmap.fromImage(im)) #Assign image_label DICOM img
-        self.displayDicomImgageWindow(im) #call function displayDicomImgageWindow with provided img to display it in a new window
-
+        displayDicomImage(self,dataset,all_tags) #Takes DICOM File
 
 
 
@@ -175,3 +218,5 @@ app = QApplication(sys.argv)
 w = MainWindow()
 w.show()
 app.exec()
+
+print('test')
