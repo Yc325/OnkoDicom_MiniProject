@@ -15,19 +15,24 @@ from PySide6.QtWidgets import (QApplication,
                                QSizePolicy,
                                QTableWidget,
                                QAbstractItemView,
-                               QHeaderView,
-                               )
-
-from PySide6.QtCore import Qt,QDir,QFile,QFileInfo
-from PySide6.QtGui import QPixmap, QCloseEvent,QAction, QIcon
-import sys
-import pydicom
-import os
-
+                               QHeaderView,)
+from PySide6.QtCore import (Qt,
+                            QDir,
+                            QFile,
+                            QFileInfo)
+from PySide6.QtGui import (QPixmap,
+                           QCloseEvent,
+                           QAction,
+                           QIcon)
 from PIL import Image
 from PIL.ImageQt import ImageQt
 import numpy as np
+
+import sys
+import pydicom
+import os
 import re
+
 # Display Dicom File
 """
 Function that creates new window to display Dicom information from choosen file
@@ -83,6 +88,7 @@ def displayDicomImgageWindow(self,
     #Right
     #button goes to IMG+1
     #_______
+
     layout = QGridLayout()
     layout.addWidget(Img_number, 1,0,1,5,Qt.AlignCenter)
     layout.addWidget(Image_partBody,3,0,1,5,Qt.AlignCenter)
