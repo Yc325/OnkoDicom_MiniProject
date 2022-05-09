@@ -7,8 +7,6 @@ from display_func import *
 
 
 class MainWindow(QMainWindow):
-
-
     def __init__(self):
         super().__init__()
         self.w = True  # No external window yet.
@@ -25,7 +23,7 @@ class MainWindow(QMainWindow):
         label.setAlignment(Qt.AlignHCenter | Qt.AlignVCenter)  # set aligment
 
         #Create LOGO of DICOM
-        pixmap = QPixmap('img/logo.png')
+        pixmap = QPixmap('./img/logo.png')
         pixmap = pixmap.scaled(200,200, Qt.KeepAspectRatio)
         label.setPixmap(pixmap)  # add img
 
@@ -203,6 +201,7 @@ class MainWindow(QMainWindow):
     def openFileOfItem(self, row, column):
         item = self.filesTable.item(row, 0)
         path = self.directoryComboBox.currentText() + "/" + item.text()
+        print(path)
         dataset = pydicom.dcmread(path)
 
         all_tags = ''
@@ -211,8 +210,6 @@ class MainWindow(QMainWindow):
             all_tags += tag
 
         displayDicomImage(self,dataset,all_tags) #Takes DICOM File
-
-
 
 app = QApplication(sys.argv)
 w = MainWindow()

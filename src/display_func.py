@@ -123,6 +123,7 @@ def displayDicomImage(self, ds,all_tags):
     wc = int(ec.value[0] if ec.VM > 1 else ec.value)
     # Takes Data Value if IMG (pixels)
     data = ds.pixel_array
+    print(data)
     window = ww
     level = wc
     # using numpy library
@@ -131,8 +132,14 @@ def displayDicomImage(self, ds,all_tags):
                           data > (level - 0.5 + (window - 1) / 2)],
                          [0, 255, lambda data: ((data - (level - 0.5)) /
                                                 (window - 1) + 0.5) * (255 - 0)])
+
+    print(type(image), image)
+    
     # Using PIL library
     im = Image.fromarray(image).convert('L')
+    print(type(im), im)
+
     # Using PIL library
     im = ImageQt(im)
+    print(type(im), im)
     displayDicomImgageWindow(self,im,text.value,IMG_number.value,all_tags) # call function displayDicomImgageWindow with provided img to display it in a new window
