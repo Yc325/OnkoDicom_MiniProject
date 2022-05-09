@@ -199,6 +199,8 @@ class MainWindow(QMainWindow):
     a new window
     """
 
+    #
+
     #Open Chosen file
     def openFileOfItem(self, row, column):
         item = self.filesTable.item(row, 0)
