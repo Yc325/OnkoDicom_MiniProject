@@ -27,8 +27,33 @@ class ImageWindow(QWidget):
         self._model = model
         self._main_controller = main_controller
 
-        image_window = QLabel()
+        self.image_window = QLabel()
+        self.image_title_label = QLabel()
+        self.image_number = QLabel()
 
+        self.show_data()
+
+        self.button_action_left = QPushButton(None)
+        self.button_action_left.setIcon(QtGui.QIcon("./icons/arrow-180-medium.png"))
+        self.button_action_left.clicked.connect(self._main_controller.get_previous_image_file_path)
+
+        self.button_action_right = QPushButton(None)
+        self.button_action_right.setIcon(QtGui.QIcon("./icons/arrow-000-medium.png"))
+        self.button_action_right.clicked.connect(self._main_controller.get_next_image_file_path)
+
+        layout = QGridLayout()
+        layout.addWidget(self.image_number, 1,0,1,5,QtCore.Qt.AlignCenter)
+        layout.addWidget(self.image_title_label,3,0,1,5,QtCore.Qt.AlignCenter)
+        layout.addWidget(self.button_action_left,2,0)
+        layout.addWidget(self.button_action_right,2,4)
+        layout.addWidget(self.image_window,4,0,4,5,QtCore.Qt.AlignCenter)
+
+        self.setLayout(layout)
+        self.setWindowTitle(f'Dicom Image')
+
+        self._model.selected_image_file_path_changed.connect(self.show_data)
+    
+    def show_data(self):
         dicom_file_parser = self._main_controller.getDicomParser()
         dataset = dicom_file_parser.getDataSet()
 
@@ -51,39 +76,13 @@ class ImageWindow(QWidget):
                             [0, 255, lambda data: ((data - (level - 0.5)) /
                                                     (window - 1) + 0.5) * (255 - 0)])
 
-        # print(type(np_image), np_image)
-
         # Using PIL library
         im = Image.fromarray(np_image).convert('L')
 
-        # print(type(im), im)
-
         pillow_image = ImageQt.ImageQt(im)
 
-        # print(type(pillow_image), pillow_image)
+        self.image_window.setPixmap(QtGui.QPixmap.fromImage(pillow_image))
 
-        image_window.setPixmap(QtGui.QPixmap.fromImage(pillow_image))
-
-        image_title_label = QLabel()
-        image_title_label.setText(f'Body Part: {dicom_file_parser.getBodyPartTitle()}')
-
-        image_number = QLabel()
-        image_number.setText(f'IMG # {dicom_file_parser.getImageNumber()}')
-
-        button_action_left = QPushButton(None)
-        button_action_left.setIcon(QtGui.QIcon("./icons/arrow-180-medium.png"))
-        button_action_left.clicked.connect(self._main_controller.get_previous_image_file_path)
-
-        button_action_right = QPushButton(None)
-        button_action_right.setIcon(QtGui.QIcon("./icons/arrow-000-medium.png"))
-        button_action_right.clicked.connect(self._main_controller.get_next_image_file_path)
-
-        layout = QGridLayout()
-        layout.addWidget(image_number, 1,0,1,5,QtCore.Qt.AlignCenter)
-        layout.addWidget(image_title_label,3,0,1,5,QtCore.Qt.AlignCenter)
-        layout.addWidget(button_action_left,2,0)
-        layout.addWidget(button_action_right,2,4)
-        layout.addWidget(image_window,4,0,4,5,QtCore.Qt.AlignCenter)
-
-        self.setLayout(layout)
-        self.setWindowTitle(f'Dicom Image')
+        self.image_title_label.setText(f'Body Part: {dicom_file_parser.getBodyPartTitle()}')
+        
+        self.image_number.setText(f'IMG # {dicom_file_parser.getImageNumber()}')

@@ -35,6 +35,7 @@ class MainController(QObject):
         super().__init__()
 
         self._model = model
+        self.dicom_image_window = None
 
     # @pyqtSlot(str)
     def change_selected_dicom_directory(self, value):
@@ -50,8 +51,9 @@ class MainController(QObject):
         self.dicom_file_parser = DicomFileParser(value)
 
         # create ImageWindow() instance using same model
-        self.dicom_image_window = ImageWindow(self._model, self)
-        self.dicom_image_window.show()
+        if not self.dicom_image_window:
+            self.dicom_image_window = ImageWindow(self._model, self)
+            self.dicom_image_window.show()
     
     def get_previous_image_file_path(self):
         current_image_file_path = self._model.selected_image_file_path
@@ -60,13 +62,16 @@ class MainController(QObject):
         index = files.index(current_image_file_path.split("/")[-1])-1
 
         new_path = f"{self._model.selected_dicom_directory}/{files[index]}"
+        
+        self.dicom_file_parser = DicomFileParser(new_path)
+        
         self.change_selected_image_file_path(new_path)
         print("image path: "+new_path)
-        self.dicom_file_parser = DicomFileParser(new_path)
+        
 
         # create ImageWindow() instance using same model
-        self.dicom_image_window = ImageWindow(self._model, self)
-        self.dicom_image_window.show()
+        # self.dicom_image_window = ImageWindow(self._model, self)
+        # self.dicom_image_window.show()
     
     def get_next_image_file_path(self):
         current_image_file_path = self._model.selected_image_file_path
@@ -75,13 +80,16 @@ class MainController(QObject):
         index = files.index(current_image_file_path.split("/")[-1])+1
 
         new_path = f"{self._model.selected_dicom_directory}/{files[index]}"
+        
+        self.dicom_file_parser = DicomFileParser(new_path)
+        
         self.change_selected_image_file_path(new_path)
         print("image path: "+new_path)
-        self.dicom_file_parser = DicomFileParser(new_path)
+        
 
         # create ImageWindow() instance using same model
-        self.dicom_image_window = ImageWindow(self._model, self)
-        self.dicom_image_window.show()
+        # self.dicom_image_window = ImageWindow(self._model, self)
+        # self.dicom_image_window.show()
 
     def getDicomParser(self):
         return self.dicom_file_parser
