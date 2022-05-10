@@ -6,12 +6,16 @@ Applciation uses pyside6 for GUI
 pip install -r requirements.txt
 
 **To run:** 
-python src/main.py
+WARNING: It must be run from this location (ie. in the root directory) to avoid some issues at the moment.
+```python src/main.py```
 
 **Design:**
-main.py --> creates instances of model, view, controller
-views --> Display windows
-models --> Stores program data and state
+1. main.py: 
+-creates instances of model, view, controller
+2. views 
+-Display windows
+3. models: 
+-Stores program data and state
     --> In our case, we need to track the current open file and its data.
     --> Track directory that we are using too.
 controller --> performs logic. Links view to model (should not directly talk)
@@ -21,6 +25,12 @@ controller --> performs logic. Links view to model (should not directly talk)
         -set/get dicom directory
         -set/get current file
         -Navigate through files
+
+**Contributions**
+Run:
+```pytest```
+```pylint --extension-pkg-whitelist=PyQt6,PySide6 src/```
+```pycodestyle --show-source --show-pep8 src/```
 
 **References:**
 https://doc.qt.io/qt-5/model-view-programming.html#handling-selections-of-items
