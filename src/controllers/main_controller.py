@@ -108,6 +108,7 @@ class MainController(QObject):
 
         return list(sorted_dict.keys())
 
+
 # move this function somewhere more relevent
 def get_type(file):
     """
@@ -127,8 +128,8 @@ def get_type(file):
     # Check to see what type of data the given DICOM file holds
     if class_uid in elements:
         return elements[class_uid]
-    else:
-        return False
+    return False
+
 
 def get_instance_number_of_file(file):
     """
