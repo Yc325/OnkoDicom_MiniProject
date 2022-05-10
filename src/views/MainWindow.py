@@ -74,65 +74,47 @@ class MainView(QMainWindow):
         
         # rather than calling the main_controller directly
         # an intermittent function is required to get/present the data
-        self.filesTable.cellClicked.connect(self.selectImageFile)
+        self.filesTable.cellClicked.connect(self.select_image_file)
 
         # listen for model event signals
         # self._model.amount_changed.connect(self.on_amount_changed)
         # listening for change in selected directory
         self._model.selected_dicom_directory_changed.connect(self.on_selected_dicom_directory_changed)
 
-    # @pyqtSlot(str)
     def on_selected_dicom_directory_changed(self, path):
-        try:
-            self.filesTable.setRowCount(0)
+        """
+        Displays all DICOM image files in a table with name and size
+        """
+        
+        self.filesTable.setRowCount(0)
+        
+        files = self._main_controller.get_dicom_image_files_in_selected_path(path)
 
-            self.currentDir = QDir(path)
-            fileName = "*.dcm"
-            # files = self.currentDir.entryList([fileName],
-            #                                     QDir.Files | QDir.NoSymLinks)
+        for absolute_path in files:
+            current_image_file_size = os.stat(absolute_path).st_size
 
-            files = os.listdir(path)
+            file_name = absolute_path.split("/")[-1]
 
-            for file_name in files:
-                file = QFile(self.currentDir.absoluteFilePath(file_name))
-                size = QFileInfo(file).size()
+            file_name_item = QTableWidgetItem(file_name)
 
-                fileNameItem = QTableWidgetItem(file_name)
+            # fileNameItem.setFlags(fileNameItem.flags() ^ Qt.ItemIsEditable)
+            size_item = QTableWidgetItem("%d KB" % (int((current_image_file_size + 1023) / 1024))) #Caluclate size
+            # sizeItem.setTextAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignRight)
+            # sizeItem.setFlags(sizeItem.flags() ^ QtCore.Qt.ItemIsEditable)
 
-                fileNameNumber = (''.join(filter(str.isdigit,file_name))) #get number from the name of the file
+            row = self.filesTable.rowCount()
+            self.filesTable.insertRow(row)
+            self.filesTable.setItem(row, 0, file_name_item)
+            self.filesTable.setItem(row, 1, size_item)
+            # self.filesTable.setItem(row, 2, Item_number) #insert row of file number
 
-                # For sorting items and adding them to hidden column
-                # if 'RT' not in file_name:
-                #     Item_number = QTableWidgetItem()
-                #     Item_number.setData(QtCore.Qt.EditRole, int(fileNameNumber))
-                #     Item_number.setFlags(Item_number.flags() ^ Qt.ItemIsEditable)
-                # else:
-                #     print(fileNameNumber)
-                #     Item_number = QTableWidgetItem('RT')
-                #     Item_number.setFlags(Item_number.flags() ^ Qt.ItemIsEditable)
+        # self.filesFoundLabel.setText("%d file(s) found (Double click on a file to open it)" % len(files))
 
-
-                # fileNameItem.setFlags(fileNameItem.flags() ^ Qt.ItemIsEditable)
-                sizeItem = QTableWidgetItem("%d KB" % (int((size + 1023) / 1024))) #Caluclate size
-                # sizeItem.setTextAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignRight)
-                # sizeItem.setFlags(sizeItem.flags() ^ QtCore.Qt.ItemIsEditable)
-
-
-                row = self.filesTable.rowCount()
-                self.filesTable.insertRow(row)
-                self.filesTable.setItem(row, 0, fileNameItem)
-                self.filesTable.setItem(row, 1, sizeItem)
-                # self.filesTable.setItem(row, 2, Item_number) #insert row of file number
-
-            # self.filesFoundLabel.setText("%d file(s) found (Double click on a file to open it)" % len(files))
-            # self.filesTable.sortItems(2, order=QtCore.Qt.AscendingOrder)
-        except Exception as e:
-            print(e)
-
-    def selectImageFile(self, row, column):
+    def select_image_file(self, row, column):
         print(row, column)
         # gets path from selected cell choice
         item = self.filesTable.item(row, 0)
+        print(item.text())
         path = self.directory_input_text.text() + "/" + item.text()
         
         # sends to controller

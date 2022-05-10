@@ -1,34 +1,10 @@
-from PySide6.QtCore import Qt,QDir,QFile,QFileInfo,QObject
-from PySide6.QtGui import QPixmap, QCloseEvent,QAction, QIcon
-import sys
-import pydicom
+from lzma import FILTER_DELTA
+from PySide6.QtCore import QObject
+from models.DicomFileParserModel import DicomFileModel
 import os
-import re
-
 from views.ImageWindow import ImageWindow
-
-class DicomFileParser:
-    def __init__(self, path):
-        dataset = pydicom.dcmread(path)
-
-        all_tags = ''
-        for elem in dataset:
-            tag = str(elem) + '\n'
-            all_tags += tag
-
-        self.dataset = dataset
-        self.all_tags = all_tags
-        self.body_part_title = dataset['BodyPartExamined'].value #it take value from Dicom file that has ket 'Body Part Examined'
-        self.image_number = dataset['InstanceNumber'].value #it take value from Dicom file that has ket 'Instance Number'
-
-    def getImageNumber(self):
-        return self.image_number
-
-    def getBodyPartTitle(self):
-        return self.body_part_title
-
-    def getDataSet(self):
-        return self.dataset
+import pydicom
+import collections
 
 class MainController(QObject):
     def __init__(self, model):
@@ -36,60 +12,94 @@ class MainController(QObject):
 
         self._model = model
         self.dicom_image_window = None
+        self.dicom_file_parser = None
 
-    # @pyqtSlot(str)
     def change_selected_dicom_directory(self, value):
         print(f"controller: {value}")
         self._model.selected_dicom_directory = value
 
-    # @pyqtSlot(str)
     def change_selected_image_file_path(self, value):
-        self._model.selected_image_file_path = value
+        """
+        changes the selected image file path
+        """
+        # WARNING: the dicom_file_parser must be set before the model
+        # is changed. This is because the model change will trigger 
+        # a refresh in the ImageWindow's data which will reference the 
+        # dicom_file_parser.
+        self.dicom_file_parser = DicomFileModel(value)
 
-        # any extra data that needataset to be changed
-        
-        self.dicom_file_parser = DicomFileParser(value)
+        # this will emit signal to the Image view to refresh it's data
+        self._model.selected_image_file_path = value
 
         # create ImageWindow() instance using same model
         if not self.dicom_image_window:
             self.dicom_image_window = ImageWindow(self._model, self)
-            self.dicom_image_window.show()
+        self.dicom_image_window.show()
     
     def get_previous_image_file_path(self):
         current_image_file_path = self._model.selected_image_file_path
 
-        files = os.listdir(self._model.selected_dicom_directory)
-        index = files.index(current_image_file_path.split("/")[-1])-1
+        files = self.get_dicom_image_files_in_selected_path()
+        index = (files.index(current_image_file_path)-1)%len(files)
 
-        new_path = f"{self._model.selected_dicom_directory}/{files[index]}"
-        
-        self.dicom_file_parser = DicomFileParser(new_path)
+        new_path = f"{files[index]}"
         
         self.change_selected_image_file_path(new_path)
         print("image path: "+new_path)
-        
-
-        # create ImageWindow() instance using same model
-        # self.dicom_image_window = ImageWindow(self._model, self)
-        # self.dicom_image_window.show()
     
     def get_next_image_file_path(self):
         current_image_file_path = self._model.selected_image_file_path
 
-        files = os.listdir(self._model.selected_dicom_directory)
-        index = files.index(current_image_file_path.split("/")[-1])+1
+        files = self.get_dicom_image_files_in_selected_path()
+        index = (files.index(current_image_file_path)+1)%len(files)
 
-        new_path = f"{self._model.selected_dicom_directory}/{files[index]}"
-        
-        self.dicom_file_parser = DicomFileParser(new_path)
+        new_path = f"{files[index]}"
         
         self.change_selected_image_file_path(new_path)
         print("image path: "+new_path)
-        
-
-        # create ImageWindow() instance using same model
-        # self.dicom_image_window = ImageWindow(self._model, self)
-        # self.dicom_image_window.show()
 
     def getDicomParser(self):
         return self.dicom_file_parser
+
+    def get_dicom_image_files_in_selected_path(self, path=None):
+        """
+        Returns a sorted list of DICOM image files in the   
+        current selected directory
+        """
+        files = []
+
+        if path:
+            dir = path
+        else:
+            dir = self._model.selected_dicom_directory
+            
+        files = os.listdir(dir)
+        
+        filtered_files = []
+
+        # filter by .dcm file_type
+        for file in files:
+            if file.endswith(".dcm"):
+                filtered_files.append(f"{dir}/{file}")
+
+        # sort in number order? 
+        # Not sure if this a universal naming standard though so 
+        # could be a flaky way of sorting
+        dictionary = {}
+        
+        for file in filtered_files:
+            number = self.get_instance_number_of_file(file)
+            dictionary[file] = number
+
+        sorted_list_of_tuples = sorted(dictionary.items(), key=lambda x: x[1])
+        sorted_dict = collections.OrderedDict(sorted_list_of_tuples)
+
+        return list(sorted_dict.keys())
+
+    # TODO: this function should be moved elsewhere
+    def get_instance_number_of_file(self, file):
+        """
+        Retrieves the instance number of a given .dcm file
+        """
+        dataset = pydicom.dcmread(file)
+        return int(dataset["InstanceNumber"].value)

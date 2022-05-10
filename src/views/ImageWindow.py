@@ -1,4 +1,3 @@
-import PySide6
 from PySide6 import QtCore, QtGui
 import sys
 # this is required because of ImageQt backend issues
@@ -6,21 +5,21 @@ import sys
 sys.modules['PyQt6.QtGui'] = QtGui
 
 #import Libraries
-from PySide6.QtWidgets import ( QApplication,
-                                QLabel,
+from PySide6.QtWidgets import ( QLabel,
                                 QPushButton,
                                 QWidget,
                                 QGridLayout,
                                 QGridLayout,
-                                QTableWidget,
                                )
-
-import PIL
 from PIL import Image, ImageQt
 import numpy as np
-from PySide6.QtGui import QPixmap
 
 class ImageWindow(QWidget):
+    """
+    The window that displays the dicom image,
+    arrows to navigate through multiple images,
+    and name and number of image file.
+    """
     def __init__(self, model, main_controller):
         super().__init__()
 
@@ -49,11 +48,16 @@ class ImageWindow(QWidget):
         layout.addWidget(self.image_window,4,0,4,5,QtCore.Qt.AlignCenter)
 
         self.setLayout(layout)
-        self.setWindowTitle(f'Dicom Image')
+        self.setWindowTitle("Dicom Image")
 
+        # actually subscribes the window to the model data as well
         self._model.selected_image_file_path_changed.connect(self.show_data)
     
     def show_data(self):
+        """
+        Refreshes all the data on the image window with reference to the
+        DicomFileParserModel stored on the MainController
+        """
         dicom_file_parser = self._main_controller.getDicomParser()
         dataset = dicom_file_parser.getDataSet()
 

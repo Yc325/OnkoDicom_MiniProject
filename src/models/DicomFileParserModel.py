@@ -1,0 +1,30 @@
+import pydicom
+
+class DicomFileModel:
+    """
+    A model class that handles all the processing of the dicom files
+    """
+    def __init__(self, path):
+        dataset = pydicom.dcmread(path)
+
+        all_tags = ''
+        for elem in dataset:
+            tag = str(elem) + '\n'
+            all_tags += tag
+
+        self.dataset = dataset
+        self.all_tags = all_tags
+        self.body_part_title = dataset['BodyPartExamined'].value #it take value from Dicom file that has ket 'Body Part Examined'
+        self.image_number = dataset['InstanceNumber'].value #it take value from Dicom file that has ket 'Instance Number'
+
+    def getImageNumber(self):
+        """Gets the image number"""
+        return self.image_number
+
+    def getBodyPartTitle(self):
+        """Gets the body part title"""
+        return self.body_part_title
+
+    def getDataSet(self):
+        """Gets the dataset"""
+        return self.dataset
