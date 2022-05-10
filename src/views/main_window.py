@@ -2,25 +2,27 @@
 import os
 from PyQt6.QtCore import QDir
 from PySide6.QtWidgets import (
-                                QLabel,
-                                QMainWindow,
-                                QPushButton,
-                                QWidget,
-                                QFileDialog,
-                                QGridLayout,
-                                QHBoxLayout,
-                               QTableWidgetItem,
-                               QTableWidget,
-                               QAbstractItemView,
-                               QHeaderView,
-                               QLineEdit,
-                               )
+    QLabel,
+    QMainWindow,
+    QPushButton,
+    QWidget,
+    QFileDialog,
+    QGridLayout,
+    QHBoxLayout,
+    QTableWidgetItem,
+    QTableWidget,
+    QAbstractItemView,
+    QHeaderView,
+    QLineEdit,
+)
 # pylint: disable=E1101
+
 
 class MainView(QMainWindow):
     """
     Handles main window (UI) displayed to user
     """
+
     def __init__(self, model, main_controller):
         super().__init__()
 
@@ -29,7 +31,8 @@ class MainView(QMainWindow):
 
         # directory search bar
         self.browse_files_button = QPushButton("&Browse...")
-        self.browse_files_button.clicked.connect(self.browse_for_dicom_file_directory)
+        self.browse_files_button.clicked.connect(
+            self.browse_for_dicom_file_directory)
 
         directory_input_text = QLineEdit()
         directory_input_text.setText(QDir.currentPath())
@@ -43,8 +46,11 @@ class MainView(QMainWindow):
 
         self.files_table = QTableWidget(0, 2)
         self.files_table.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.files_table.setHorizontalHeaderLabels(("File Name", "Size",None))
-        self.files_table.horizontalHeader().setSectionResizeMode(0, QHeaderView.Stretch)
+        self.files_table.setHorizontalHeaderLabels(("File Name", "Size", None))
+        self.files_table.horizontalHeader().setSectionResizeMode(
+            0,
+            QHeaderView.Stretch
+        )
         # self.files_table.verticalHeader().hide()
         # self.files_table.hideColumn(2) #hide column
         self.files_table.setShowGrid(False)
@@ -52,7 +58,7 @@ class MainView(QMainWindow):
         buttons_layout = QHBoxLayout()
         buttons_layout.addStretch()
 
-        #Create GRID LAYOUT
+        # Create GRID LAYOUT
         main_layout = QGridLayout()
         main_layout.addWidget(directory_label, 2, 0)
         main_layout.addWidget(self.directory_input_text, 2, 1)
@@ -70,7 +76,7 @@ class MainView(QMainWindow):
         # connect widgets to controller
         self.directory_input_text.textChanged.connect(
             self._main_controller.change_selected_dicom_directory
-            )
+        )
         # rather than calling the main_controller directly
         # an intermittent function is required to get/present the data
         self.files_table.cellClicked.connect(self.select_image_file)
@@ -80,7 +86,7 @@ class MainView(QMainWindow):
         # listening for change in selected directory
         self._model.selected_dicom_directory_changed.connect(
             self.on_selected_dicom_directory_changed
-            )
+        )
 
     def on_selected_dicom_directory_changed(self, path):
         """
@@ -88,7 +94,8 @@ class MainView(QMainWindow):
         """
 
         self.files_table.setRowCount(0)
-        files = self._main_controller.get_dicom_image_files_in_selected_path(path)
+        files = self._main_controller.get_dicom_image_files_in_selected_path(
+            path)
 
         for absolute_path in files:
             current_image_file_size = os.stat(absolute_path).st_size
@@ -98,15 +105,18 @@ class MainView(QMainWindow):
             file_name_item = QTableWidgetItem(file_name)
 
             # fileNameItem.setFlags(fileNameItem.flags() ^ Qt.ItemIsEditable)
-            size_item = QTableWidgetItem(f"{(int((current_image_file_size + 1023) / 1024))} KB")
-            # sizeItem.setTextAlignment(QtCore.Qt.AlignVCenter | QtCore.Qt.AlignRight)
+            size_item = QTableWidgetItem(
+                f"{(int((current_image_file_size + 1023) / 1024))} KB")
+            # sizeItem.setTextAlignment(QtCore.Qt.AlignVCenter
+            # *| QtCore.Qt.AlignRight)
             # sizeItem.setFlags(sizeItem.flags() ^ QtCore.Qt.ItemIsEditable)
 
             row = self.files_table.rowCount()
             self.files_table.insertRow(row)
             self.files_table.setItem(row, 0, file_name_item)
             self.files_table.setItem(row, 1, size_item)
-            # self.files_table.setItem(row, 2, Item_number) #insert row of file number
+            # self.files_table.setItem(row, 2, Item_number) #insert row of file
+            # number
 
         # self.files_found_label.setText("%d file(s) found
         # (Double click on a file to open it)" % len(files))
@@ -129,7 +139,7 @@ class MainView(QMainWindow):
         and select a dicom file
         """
         directory = QFileDialog.getExistingDirectory(self, "Find Files",
-                                                               QDir.currentPath())
+                                                     QDir.currentPath())
 
         # allows update of text box when directory changes?
         if directory:

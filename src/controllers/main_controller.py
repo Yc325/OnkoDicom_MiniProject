@@ -8,10 +8,12 @@ import pydicom
 from models.dicom_file_parser_model import DicomFileModel
 from views.image_window import ImageWindow
 
+
 class MainController(QObject):
     """
     Main controller that handles application logic
     """
+
     def __init__(self, model):
         super().__init__()
 
@@ -50,7 +52,7 @@ class MainController(QObject):
         current_image_file_path = self._model.selected_image_file_path
 
         files = self.get_dicom_image_files_in_selected_path()
-        index = (files.index(current_image_file_path)-1)%len(files)
+        index = (files.index(current_image_file_path) - 1) % len(files)
 
         new_path = f"{files[index]}"
         self.change_selected_image_file_path(new_path)
@@ -62,7 +64,7 @@ class MainController(QObject):
         current_image_file_path = self._model.selected_image_file_path
 
         files = self.get_dicom_image_files_in_selected_path()
-        index = (files.index(current_image_file_path)+1)%len(files)
+        index = (files.index(current_image_file_path) + 1) % len(files)
 
         new_path = f"{files[index]}"
         self.change_selected_image_file_path(new_path)
@@ -106,6 +108,8 @@ class MainController(QObject):
         return list(sorted_dict.keys())
 
 # move this function somewhere more relevent
+
+
 def get_instance_number_of_file(file):
     """
     Retrieves the instance number of a given .dcm file

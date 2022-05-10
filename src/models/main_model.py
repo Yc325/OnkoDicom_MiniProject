@@ -1,6 +1,7 @@
 """Declares MainModel for the application"""
 from PyQt6.QtCore import QObject, pyqtSignal
 
+
 class MainModel(QObject):
     """
     Main model that serves as a cnetral data store for

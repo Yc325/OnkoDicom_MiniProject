@@ -4,10 +4,12 @@ and having easier accessibility
 """
 import pydicom
 
+
 class DicomFileModel:
     """
     A model class that handles all the processing of the dicom files
     """
+
     def __init__(self, path):
         dataset = pydicom.dcmread(path)
 
