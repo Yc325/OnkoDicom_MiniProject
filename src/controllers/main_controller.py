@@ -99,8 +99,9 @@ class MainController(QObject):
         # could be a flaky way of sorting
         dictionary = {}
         for file in filtered_files:
-            number = get_instance_number_of_file(file)
-            dictionary[file] = number
+            if get_type(file) == "CT Image":
+                number = get_instance_number_of_file(file)
+                dictionary[file] = number
 
         sorted_list_of_tuples = sorted(dictionary.items(), key=lambda x: x[1])
         sorted_dict = collections.OrderedDict(sorted_list_of_tuples)
@@ -108,11 +109,31 @@ class MainController(QObject):
         return list(sorted_dict.keys())
 
 # move this function somewhere more relevent
+def get_type(file):
+    """
+    Returns the type of data contained within a DICOM file
+    :return: type, string type of data in DICOM file
+    """
+    dataset = pydicom.dcmread(file)
 
+    elements = {
+        '1.2.840.10008.5.1.4.1.1.481.3': "RT Struct",
+        '1.2.840.10008.5.1.4.1.1.2': "CT Image",
+        '1.2.840.10008.5.1.4.1.1.481.2': "RT Dose",
+        '1.2.840.10008.5.1.4.1.1.481.5': "RT Plan"
+    }
+
+    class_uid = dataset["SOPClassUID"].value
+    # Check to see what type of data the given DICOM file holds
+    if class_uid in elements:
+        return elements[class_uid]
+    else:
+        return False
 
 def get_instance_number_of_file(file):
     """
     Retrieves the instance number of a given .dcm file
     """
     dataset = pydicom.dcmread(file)
+
     return int(dataset["InstanceNumber"].value)
