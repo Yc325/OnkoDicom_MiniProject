@@ -1,18 +1,20 @@
-from PySide6 import QtCore, QtGui
+"""
+Declares class for ImageWindow
+"""
+# pylint: disable=E1101
+# pylint: disable=C0413
 import sys
-# this is required because of ImageQt backend issues
-# TODO: need to clean up our imports/dependencies as it is very fragile
+import numpy as np
+from PySide6 import QtCore, QtGui
+# WARNING: this is required because of ImageQt backend issues
+# need to clean up our imports/dependencies as it is very fragile
 sys.modules['PyQt6.QtGui'] = QtGui
-
-#import Libraries
 from PySide6.QtWidgets import ( QLabel,
                                 QPushButton,
                                 QWidget,
                                 QGridLayout,
-                                QGridLayout,
                                )
 from PIL import Image, ImageQt
-import numpy as np
 
 class ImageWindow(QWidget):
     """
@@ -52,7 +54,7 @@ class ImageWindow(QWidget):
 
         # actually subscribes the window to the model data as well
         self._model.selected_image_file_path_changed.connect(self.show_data)
-    
+
     def show_data(self):
         """
         Refreshes all the data on the image window with reference to the
@@ -63,16 +65,13 @@ class ImageWindow(QWidget):
 
         # Try turn pixel data into image
         # from https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_PIL.py
-        ew = dataset['WindowWidth']  # it takes value from DICOM FILE that has key 'Window Width'
-        ec = dataset['WindowCenter']  # it takes value from DICOM FILE that has key 'Window Center'
-        
-        ww = int(ew.value[0] if ew.VM > 1 else ew.value)
-        wc = int(ec.value[0] if ec.VM > 1 else ec.value)
-        
+        window_width = dataset['WindowWidth']
+        window_center = dataset['WindowCenter']
+
+        window = int(window_width.value[0] if window_width.VM > 1 else window_width.value)
+        level = int(window_center.value[0] if window_center.VM > 1 else window_center.value)
         # Takes Data Value if IMG (pixels)
         data = dataset.pixel_array
-        window = ww
-        level = wc
         # using numpy library
         np_image = np.piecewise(data,
                             [data <= (level - 0.5 - (window - 1) / 2),
@@ -81,12 +80,11 @@ class ImageWindow(QWidget):
                                                     (window - 1) + 0.5) * (255 - 0)])
 
         # Using PIL library
-        im = Image.fromarray(np_image).convert('L')
+        pillow_image = Image.fromarray(np_image).convert('L')
 
-        pillow_image = ImageQt.ImageQt(im)
+        qt_image = ImageQt.ImageQt(pillow_image)
 
-        self.image_window.setPixmap(QtGui.QPixmap.fromImage(pillow_image))
+        self.image_window.setPixmap(QtGui.QPixmap.fromImage(qt_image))
 
         self.image_title_label.setText(f'Body Part: {dicom_file_parser.get_body_part_title()}')
-        
         self.image_number.setText(f'IMG # {dicom_file_parser.get_image_number()}')

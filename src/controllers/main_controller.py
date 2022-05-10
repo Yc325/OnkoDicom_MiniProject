@@ -1,9 +1,12 @@
+"""
+Established MainController class
+"""
 import os
 import collections
 from PySide6.QtCore import QObject
 import pydicom
-from models.DicomFileParserModel import DicomFileModel
-from views.ImageWindow import ImageWindow
+from models.dicom_file_parser_model import DicomFileModel
+from views.image_window import ImageWindow
 
 class MainController(QObject):
     """
@@ -27,8 +30,8 @@ class MainController(QObject):
         changes the selected image file path
         """
         # WARNING: the dicom_file_parser must be set before the model
-        # is changed. This is because the model change will trigger 
-        # a refresh in the ImageWindow's data which will reference the 
+        # is changed. This is because the model change will trigger
+        # a refresh in the ImageWindow's data which will reference the
         # dicom_file_parser.
         self.dicom_file_parser = DicomFileModel(value)
 
@@ -72,7 +75,7 @@ class MainController(QObject):
 
     def get_dicom_image_files_in_selected_path(self, path=None):
         """
-        Returns a sorted list of DICOM image files in the   
+        Returns a sorted list of DICOM image files in the
         current selected directory
         """
         files = []
@@ -89,12 +92,12 @@ class MainController(QObject):
             if file.endswith(".dcm"):
                 filtered_files.append(f"{current_dir}/{file}")
 
-        # sort in number order? 
-        # Not sure if this a universal naming standard though so 
+        # sort in number order?
+        # Not sure if this a universal naming standard though so
         # could be a flaky way of sorting
         dictionary = {}
         for file in filtered_files:
-            number = self.get_instance_number_of_file(file)
+            number = get_instance_number_of_file(file)
             dictionary[file] = number
 
         sorted_list_of_tuples = sorted(dictionary.items(), key=lambda x: x[1])
@@ -102,10 +105,10 @@ class MainController(QObject):
 
         return list(sorted_dict.keys())
 
-    # TODO: this function should be moved elsewhere
-    def get_instance_number_of_file(self, file):
-        """
-        Retrieves the instance number of a given .dcm file
-        """
-        dataset = pydicom.dcmread(file)
-        return int(dataset["InstanceNumber"].value)
+# move this function somewhere more relevent
+def get_instance_number_of_file(file):
+    """
+    Retrieves the instance number of a given .dcm file
+    """
+    dataset = pydicom.dcmread(file)
+    return int(dataset["InstanceNumber"].value)

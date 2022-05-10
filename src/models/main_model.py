@@ -1,6 +1,11 @@
+"""Declares MainModel for the application"""
 from PyQt6.QtCore import QObject, pyqtSignal
 
 class MainModel(QObject):
+    """
+    Main model that serves as a cnetral data store for
+    the application to maintain state
+    """
     selected_dicom_directory_changed = pyqtSignal(str)
     selected_image_file_path_changed = pyqtSignal(str)
 
@@ -12,6 +17,9 @@ class MainModel(QObject):
 
     @property
     def selected_image_file_path(self):
+        """
+        Getter for the selected image file path
+        """
         return self._selected_image_file_path
 
     @selected_image_file_path.setter
@@ -21,6 +29,9 @@ class MainModel(QObject):
 
     @property
     def selected_dicom_directory(self):
+        """
+        Getter for the selected dicom directory
+        """
         return self._selected_dicom_directory
 
     @selected_dicom_directory.setter

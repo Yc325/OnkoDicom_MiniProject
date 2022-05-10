@@ -1,3 +1,7 @@
+"""
+Declares DicomFile model for wrapping a dicom file path
+and having easier accessibility
+"""
 import pydicom
 
 class DicomFileModel:
