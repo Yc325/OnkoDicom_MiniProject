@@ -14,17 +14,17 @@ class DicomFileModel:
 
         self.dataset = dataset
         self.all_tags = all_tags
-        self.body_part_title = dataset['BodyPartExamined'].value #it take value from Dicom file that has ket 'Body Part Examined'
-        self.image_number = dataset['InstanceNumber'].value #it take value from Dicom file that has ket 'Instance Number'
+        self.body_part_title = dataset['BodyPartExamined'].value
+        self.image_number = dataset['InstanceNumber'].value
 
-    def getImageNumber(self):
+    def get_image_number(self):
         """Gets the image number"""
         return self.image_number
 
-    def getBodyPartTitle(self):
+    def get_body_part_title(self):
         """Gets the body part title"""
         return self.body_part_title
 
-    def getDataSet(self):
+    def get_dataset(self):
         """Gets the dataset"""
         return self.dataset

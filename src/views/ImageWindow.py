@@ -58,8 +58,8 @@ class ImageWindow(QWidget):
         Refreshes all the data on the image window with reference to the
         DicomFileParserModel stored on the MainController
         """
-        dicom_file_parser = self._main_controller.getDicomParser()
-        dataset = dicom_file_parser.getDataSet()
+        dicom_file_parser = self._main_controller.get_dicom_image_parser()
+        dataset = dicom_file_parser.get_dataset()
 
         # Try turn pixel data into image
         # from https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_PIL.py
@@ -87,6 +87,6 @@ class ImageWindow(QWidget):
 
         self.image_window.setPixmap(QtGui.QPixmap.fromImage(pillow_image))
 
-        self.image_title_label.setText(f'Body Part: {dicom_file_parser.getBodyPartTitle()}')
+        self.image_title_label.setText(f'Body Part: {dicom_file_parser.get_body_part_title()}')
         
-        self.image_number.setText(f'IMG # {dicom_file_parser.getImageNumber()}')
+        self.image_number.setText(f'IMG # {dicom_file_parser.get_image_number()}')
