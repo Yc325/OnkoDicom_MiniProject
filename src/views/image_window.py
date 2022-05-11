@@ -38,13 +38,13 @@ class ImageWindow(QWidget):
 
         self.button_action_left = QPushButton(None)
         self.button_action_left.setIcon(
-            QtGui.QIcon("./icons/arrow-180-medium.png"))
+            QtGui.QIcon("./src/icons/arrow-180-medium.png"))
         self.button_action_left.clicked.connect(
             self._main_controller.get_previous_image_file_path)
 
         self.button_action_right = QPushButton(None)
         self.button_action_right.setIcon(
-            QtGui.QIcon("./icons/arrow-000-medium.png"))
+            QtGui.QIcon("./src/icons/arrow-000-medium.png"))
         self.button_action_right.clicked.connect(
             self._main_controller.get_next_image_file_path)
 
