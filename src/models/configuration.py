@@ -5,12 +5,12 @@ import sqlite3
 import os
 from pathlib import Path
 
+
 def create_hidden_dir():
     """
     Create the hidden directory
     """
-    # Path.home() will return a path object for the user's home directory, its cross-platform
-    # .joinpath will construct new path using the home directory as the foundation
+    # Path.home() gets user's home directory, its cross-platform
     path = Path.home().joinpath('Secret')
     # check if path actually exists
     if not os.path.exists(path):
@@ -21,11 +21,13 @@ def create_hidden_dir():
         os.system("attrib +h " + str(path))
     return path
 
+
 class Configuration():
     """
     Configuration Object Used To Interact With Database
     """
-    def __init__(self, db_file ='.dicom.db'):
+
+    def __init__(self, db_file='.dicom.db'):
         self.db_path = create_hidden_dir().joinpath(db_file)
         self.set_up_db()
 
@@ -34,7 +36,7 @@ class Configuration():
         Create database within the hidden directory
         """
         # Connection object to represent database
-        conn = sqlite3.connect(self.db_path)# either pass file or create an in memory database
+        conn = sqlite3.connect(self.db_path)
         # creates database if it doesn't already exist
         conn.execute("""
                 CREATE TABLE IF NOT EXISTS CONFIGURATION (
@@ -55,7 +57,7 @@ class Configuration():
         cursor = conn.cursor()
         # Gets default directory
         cursor.execute("SELECT default_dir FROM CONFIGURATION WHERE id = 1")
-        # stores directory path, if there is no directory path it will store "None"
+        # stores directory path
         path = cursor.fetchone()
         conn.close()
         return path
@@ -70,7 +72,7 @@ class Configuration():
         cursor = conn.cursor()
         cursor.execute("SELECT COUNT(*) FROM CONFIGURATION;")
         # check if file exists
-        if cursor.fetchone()[0]==0:
+        if cursor.fetchone()[0] == 0:
             # if no files exist than it will insert the default path
             conn.execute(f"""INSERT INTO configuration (id, default_dir)
                                 VALUES (1, "{new_dir}");""")
