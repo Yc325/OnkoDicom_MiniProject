@@ -1,8 +1,7 @@
 """Established MainView class"""
 import os
 
-from PIL.ImageEnhance import Color
-from PyQt6.QtCore import QDir, QSize
+from PyQt6.QtCore import QDir
 from PySide6.QtWidgets import (
     QLabel,
     QMainWindow,
@@ -15,13 +14,13 @@ from PySide6.QtWidgets import (
     QTableWidget,
     QAbstractItemView,
     QHeaderView,
-    QLineEdit, QMessageBox, QDialog,
+    QLineEdit, QDialog,
 )
-# pylint: disable=E1101
-import sys
-from src.models.configuration import Configuration
+# pylint: disable = E1101
+from src.models.configuration import Configuration # pylint: disable = E0401
 
 config = Configuration()
+
 
 class MainView(QMainWindow):
     """
@@ -96,18 +95,19 @@ class MainView(QMainWindow):
         # checks for default directory
         self.check_preference()
 
-
     def check_preference(self):
+        """
+        Checks User Preferences
+        """
         # checks if user has a default directory save in the db
-        dir = config.get_default_dir()
-        if dir is None:
+        directory = config.get_default_dir()
+        if directory is None:
             # no directory found, therefore opens popup
             self.browse_for_dicom_file_directory()
         else:
             # There is a directory so it displays files
-            self.directory_input_text.setText(dir[0])
-            self.on_selected_dicom_directory_changed(dir[0])
-
+            self.directory_input_text.setText(directory[0])
+            self.on_selected_dicom_directory_changed(directory[0])
 
     def on_selected_dicom_directory_changed(self, path):
         """
@@ -163,6 +163,10 @@ class MainView(QMainWindow):
 
 
 class Popup(QDialog):
+    """
+    Creates Popup Window For User To Find DICOM Files
+    """
+
     def __init__(self, parent):
         super().__init__(parent)
         self.resize(500, 250)
@@ -192,5 +196,3 @@ class Popup(QDialog):
         # updates parent window with new directory
         self.parent().check_preference()
         self.close()
-
-

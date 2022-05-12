@@ -1,3 +1,6 @@
+"""
+Establishes Database
+"""
 import sqlite3
 import os
 from pathlib import Path
@@ -18,12 +21,11 @@ def create_hidden_dir():
         os.system("attrib +h " + str(path))
     return path
 
-
-# Singleton allows you to create only one instance of a class through the lifetime of a program
-# (metaclass=Singleton):will add later as you need to install package that isn't included in requirements
 class Configuration():
-
-    def __init__(self, db_path ='', db_file ='.dicom.db'):
+    """
+    Configuration Object Used To Interact With Database
+    """
+    def __init__(self, db_file ='.dicom.db'):
         self.db_path = create_hidden_dir().joinpath(db_file)
         self.set_up_db()
 
@@ -70,17 +72,12 @@ class Configuration():
         # check if file exists
         if cursor.fetchone()[0]==0:
             # if no files exist than it will insert the default path
-            conn.execute("""INSERT INTO configuration (id, default_dir) 
-                                VALUES (1, "%s");""" % new_dir)
+            conn.execute(f"""INSERT INTO configuration (id, default_dir)
+                                VALUES (1, "{new_dir}");""")
         else:
             # if files exist than it will update the default path
-            conn.execute("""UPDATE CONFIGURATION
-                            SET default_dir = "%s"
-                            WHERE id = 1;""" % new_dir)
+            conn.execute(f"""UPDATE CONFIGURATION
+                            SET default_dir = "{new_dir}"
+                            WHERE id = 1;""")
         conn.commit()
         conn.close()
-
-
-
-
-
