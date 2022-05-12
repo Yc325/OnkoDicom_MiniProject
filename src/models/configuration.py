@@ -15,7 +15,7 @@ def create_hidden_dir():
         # creates new directory
         os.mkdir(path)
         # Sets hidden attribute to hide (+h hide -h reveal)
-        #os.system("attrib +h " + str(path))
+        os.system("attrib +h " + str(path))
     return path
 
 

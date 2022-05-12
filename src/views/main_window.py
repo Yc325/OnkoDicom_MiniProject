@@ -1,6 +1,8 @@
 """Established MainView class"""
 import os
-from PyQt6.QtCore import QDir
+
+from PIL.ImageEnhance import Color
+from PyQt6.QtCore import QDir, QSize
 from PySide6.QtWidgets import (
     QLabel,
     QMainWindow,
@@ -13,10 +15,13 @@ from PySide6.QtWidgets import (
     QTableWidget,
     QAbstractItemView,
     QHeaderView,
-    QLineEdit,
+    QLineEdit, QMessageBox, QDialog,
 )
 # pylint: disable=E1101
+import sys
+from src.models.configuration import Configuration
 
+config = Configuration()
 
 class MainView(QMainWindow):
     """
@@ -29,13 +34,13 @@ class MainView(QMainWindow):
         self._model = model
         self._main_controller = main_controller
 
-        # directory search bar
-        self.browse_files_button = QPushButton("&Browse...")
+        # directory search button
+        self.browse_files_button = QPushButton("&Change...")
         self.browse_files_button.clicked.connect(
             self.browse_for_dicom_file_directory)
 
         directory_input_text = QLineEdit()
-        directory_input_text.setText(QDir.currentPath())
+        # directory_input_text.setText(QDir.currentPath())
         # comboBox.setSizePolicy(QSizePolicy.Expanding,
         #                        QSizePolicy.Preferred)
 
@@ -88,6 +93,22 @@ class MainView(QMainWindow):
             self.on_selected_dicom_directory_changed
         )
 
+        # checks for default directory
+        self.check_preference()
+
+
+    def check_preference(self):
+        # checks if user has a default directory save in the db
+        dir = config.get_default_dir()
+        if dir is None:
+            # no directory found, therefore opens popup
+            self.browse_for_dicom_file_directory()
+        else:
+            # There is a directory so it displays files
+            self.directory_input_text.setText(dir[0])
+            self.on_selected_dicom_directory_changed(dir[0])
+
+
     def on_selected_dicom_directory_changed(self, path):
         """
         Displays all DICOM image files in a table with name and size
@@ -135,13 +156,41 @@ class MainView(QMainWindow):
 
     def browse_for_dicom_file_directory(self):
         """
+        Opens PopUp Window
+        """
+        pop = Popup(self)
+        pop.show()
+
+
+class Popup(QDialog):
+    def __init__(self, parent):
+        super().__init__(parent)
+        self.resize(500, 250)
+
+        self.directory_label = QLabel("Directory:", self)
+        self.directory_input_text = QLineEdit(self)
+        self.browse_files = QPushButton("&Browse...")
+
+        self.layout = QHBoxLayout(self)
+        self.layout.addWidget(self.directory_label)
+        self.layout.addWidget(self.directory_input_text)
+        self.layout.addWidget(self.browse_files)
+
+        self.browse_files.clicked.connect(
+            self.browse_directory)
+
+    def browse_directory(self):
+        """
         Opens window to allow user to browse directories on their computer
         and select a dicom file
         """
+        # User can choose directory
         directory = QFileDialog.getExistingDirectory(self, "Find Files",
                                                      QDir.currentPath())
+        # updates database with new directory
+        config.update_default_dir(directory)
+        # updates parent window with new directory
+        self.parent().check_preference()
+        self.close()
 
-        # allows update of text box when directory changes?
-        if directory:
-            if self.directory_input_text.text() != directory:
-                self.directory_input_text.setText(directory)
+
