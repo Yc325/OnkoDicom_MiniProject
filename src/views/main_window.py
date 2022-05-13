@@ -17,8 +17,7 @@ from PySide6.QtWidgets import (
     QLineEdit, QDialog,
 )
 # pylint: disable = E1101
-# pylint: disable = E0401
-from src.models.configuration import Configuration
+from models.configuration import Configuration
 
 config = Configuration()
 
