@@ -1,25 +1,20 @@
 """Established MainView class"""
 import os
 
-from PyQt6.QtCore import QDir
 from PySide6.QtWidgets import (
     QLabel,
     QMainWindow,
     QPushButton,
     QWidget,
-    QFileDialog,
     QGridLayout,
     QHBoxLayout,
     QTableWidgetItem,
     QTableWidget,
     QAbstractItemView,
     QHeaderView,
-    QLineEdit, QDialog,
+    QLineEdit,
 )
 # pylint: disable = E1101
-from models.configuration import Configuration
-
-config = Configuration()
 
 
 class MainView(QMainWindow):
@@ -36,7 +31,7 @@ class MainView(QMainWindow):
         # directory search button
         self.browse_files_button = QPushButton("&Change...")
         self.browse_files_button.clicked.connect(
-            self.browse_for_dicom_file_directory)
+            self._main_controller.browse_for_dicom_file_directory)
 
         directory_input_text = QLineEdit()
         # directory_input_text.setText(QDir.currentPath())
@@ -93,32 +88,21 @@ class MainView(QMainWindow):
         )
 
         # checks for default directory
-        self.check_preference()
-
-    def check_preference(self):
-        """
-        Checks User Preferences
-        """
-        # checks if user has a default directory save in the db
-        directory = config.get_default_dir()
-        if directory is None:
-            # no directory found, therefore opens popup
-            self.browse_for_dicom_file_directory()
-        else:
-            # There is a directory so it displays files
-            self.directory_input_text.setText(directory[0])
-            self.on_selected_dicom_directory_changed(directory[0])
+        self._main_controller.check_preference()
 
     def on_selected_dicom_directory_changed(self, path):
         """
         Displays all DICOM image files in a table with name and size
         """
 
+        self.directory_input_text.setText(path)
+
         self.files_table.setRowCount(0)
         files = self._main_controller.get_dicom_image_files_in_selected_path(
             path)
 
         for absolute_path in files:
+            # change this stat cmd as it produces a stats file
             current_image_file_size = os.stat(absolute_path).st_size
 
             file_name = absolute_path.split("/")[-1]
@@ -136,8 +120,6 @@ class MainView(QMainWindow):
             self.files_table.insertRow(row)
             self.files_table.setItem(row, 0, file_name_item)
             self.files_table.setItem(row, 1, size_item)
-            # self.files_table.setItem(row, 2, Item_number) #insert row of file
-            # number
 
         # self.files_found_label.setText("%d file(s) found
         # (Double click on a file to open it)" % len(files))
@@ -153,46 +135,3 @@ class MainView(QMainWindow):
         path = self.directory_input_text.text() + "/" + item.text()
         # sends to controller
         self._main_controller.change_selected_image_file_path(path)
-
-    def browse_for_dicom_file_directory(self):
-        """
-        Opens PopUp Window
-        """
-        pop = Popup(self)
-        pop.show()
-
-
-class Popup(QDialog):
-    """
-    Creates Popup Window For User To Find DICOM Files
-    """
-
-    def __init__(self, parent):
-        super().__init__(parent)
-        self.resize(500, 250)
-
-        self.directory_label = QLabel("Directory:", self)
-        self.directory_input_text = QLineEdit(self)
-        self.browse_files = QPushButton("&Browse...")
-
-        self.layout = QHBoxLayout(self)
-        self.layout.addWidget(self.directory_label)
-        self.layout.addWidget(self.directory_input_text)
-        self.layout.addWidget(self.browse_files)
-
-        self.browse_files.clicked.connect(
-            self.browse_directory)
-
-    def browse_directory(self):
-        """
-        Opens window to allow user to browse directories on their computer
-        and select a dicom file
-        """
-        # User can choose directory
-        directory = QFileDialog.getExistingDirectory(self, "Find Files",
-                                                     QDir.currentPath())
-        # updates database with new directory
-        config.update_default_dir(directory)
-        # updates parent window with new directory
-        self.parent().check_preference()
-        self.close()

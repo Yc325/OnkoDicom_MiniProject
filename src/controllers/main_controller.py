@@ -6,7 +6,9 @@ import collections
 from PySide6.QtCore import QObject
 import pydicom
 from models.dicom_file_parser_model import DicomFileModel
+from models.configuration import Configuration
 from views.image_window import ImageWindow
+from views.popup_for_default_directory import Popup
 
 
 class MainController(QObject):
@@ -20,6 +22,7 @@ class MainController(QObject):
         self._model = model
         self.dicom_image_window = None
         self.dicom_file_parser = None
+        self._config = Configuration()
 
     def change_selected_dicom_directory(self, value):
         """
@@ -107,6 +110,35 @@ class MainController(QObject):
         sorted_dict = collections.OrderedDict(sorted_list_of_tuples)
 
         return list(sorted_dict.keys())
+
+    def check_preference(self):
+        """
+        Checks User Preferences
+        """
+        # checks if user has a default directory save in the db
+        directory = self._config.get_default_dir()
+        if directory is None:
+            # no directory found, therefore opens popup
+            self.browse_for_dicom_file_directory()
+        else:
+            # There is a directory so it sets it in the model
+            # setting this in the model triggers the main window
+            # to change
+            self.change_selected_dicom_directory(directory[0])
+
+    def browse_for_dicom_file_directory(self):
+        """
+        Opens PopUp Window
+        """
+        pop = Popup(self)
+        pop.exec()
+        # pop.show()
+
+    def get_config(self):
+        """
+        Gets the config object
+        """
+        return self._config
 
 
 # move this function somewhere more relevent
