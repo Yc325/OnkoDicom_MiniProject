@@ -11,7 +11,6 @@ from views.image_window import ImageWindow
 from views.popup_for_default_directory import Popup
 
 
-
 class MainController(QObject):
     """
     Main controller that handles application logic
