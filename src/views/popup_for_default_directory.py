@@ -43,7 +43,6 @@ class Popup(QDialog):
                                                      QDir.currentPath())
         # updates database with new directory
         self._main_controller.get_config().update_default_dir(directory)
-        
         # asks the main controller to recheck db for directoy
         self._main_controller.check_preference()
         self.close()

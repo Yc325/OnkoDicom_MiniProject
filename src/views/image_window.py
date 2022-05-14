@@ -1,6 +1,7 @@
 """
 Declares class for ImageWindow
 """
+# pylint: disable=E1101
 from PySide6.QtWidgets import (QLabel,
                                QPushButton,
                                QWidget,
@@ -61,7 +62,9 @@ class ImageWindow(QWidget):
         """
         dicom_file_parser = self._main_controller.get_dicom_image_parser()
 
-        self.image_window.setPixmap(QtGui.QPixmap.fromImage(dicom_file_parser.get_qtimage()))
+        self.image_window.setPixmap(
+            QtGui.QPixmap.fromImage(dicom_file_parser.get_qtimage())
+            )
 
         self.image_title_label.setText(
             f'Body Part: {dicom_file_parser.get_body_part_title()}')

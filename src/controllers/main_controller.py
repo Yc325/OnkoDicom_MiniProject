@@ -103,8 +103,8 @@ class MainController(QObject):
         dictionary = {}
         for file in filtered_files:
             dicom_parser_instance = DicomFileModel(file)
-            if dicom_parser_instance.get_type(file) == "CT Image":
-                number = dicom_parser_instance.get_instance_number(file)
+            if dicom_parser_instance.get_type() == "CT Image":
+                number = dicom_parser_instance.get_instance_number()
                 dictionary[file] = number
 
         sorted_list_of_tuples = sorted(dictionary.items(), key=lambda x: x[1])

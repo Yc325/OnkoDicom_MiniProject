@@ -116,7 +116,8 @@ class MainView(QMainWindow):
             self.files_table.setItem(row, 0, file_name_item)
             self.files_table.setItem(row, 1, size_item)
 
-        files_found_str = f"{len(files)} file(s) found (Click on a file to open it)"
+        files_found_str = f"{len(files)} file(s) \
+        found (Click on a file to open it)"
         self.files_found_label.setText(files_found_str)
 
     def select_image_file(self, row, column):

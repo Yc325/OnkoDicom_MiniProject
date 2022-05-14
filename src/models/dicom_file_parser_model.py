@@ -2,16 +2,17 @@
 Declares DicomFile model for wrapping a dicom file path
 and having easier accessibility
 """
-import pydicom
 # pylint: disable=E1101
 # pylint: disable=C0413
 import sys
 import numpy as np
+import pydicom
 from PySide6 import QtGui
 # WARNING: this is required because of ImageQt backend issues
 # need to clean up our imports/dependencies as it is very fragile
 sys.modules['PyQt6.QtGui'] = QtGui
 from PIL import Image, ImageQt  # noqa: E402
+
 
 class DicomFileModel:
     """
