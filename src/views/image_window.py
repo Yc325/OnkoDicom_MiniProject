@@ -1,20 +1,12 @@
 """
 Declares class for ImageWindow
 """
-# pylint: disable=E1101
-# pylint: disable=C0413
-import sys
-import numpy as np
 from PySide6.QtWidgets import (QLabel,
                                QPushButton,
                                QWidget,
                                QGridLayout,
                                )
 from PySide6 import QtCore, QtGui
-# WARNING: this is required because of ImageQt backend issues
-# need to clean up our imports/dependencies as it is very fragile
-sys.modules['PyQt6.QtGui'] = QtGui
-from PIL import Image, ImageQt  # noqa: E402
 
 
 class ImageWindow(QWidget):
@@ -68,37 +60,10 @@ class ImageWindow(QWidget):
         DicomFileParserModel stored on the MainController
         """
         dicom_file_parser = self._main_controller.get_dicom_image_parser()
-        dataset = dicom_file_parser.get_dataset()
 
-        # Try turn pixel data into image
-        # from
-        # https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_PIL.py
-        win_width = dataset['WindowWidth']
-        win_center = dataset['WindowCenter']
-
-        window = int(
-            win_width.value[0] if win_width.VM > 1 else win_width.value)
-        level = int(
-            win_center.value[0] if win_center.VM > 1 else win_center.value)
-        # Takes Data Value if IMG (pixels)
-        data = dataset.pixel_array
-        # using numpy library
-        np_image = np.piecewise(data,
-                                [data <= (level - 0.5 - (window - 1) / 2),
-                                 data > (level - 0.5 + (window - 1) / 2)],
-                                [0,
-                                 255,
-                                 lambda data: ((data - (level - 0.5)) /
-                                               (window - 1) + 0.5)*(255 - 0)])
-
-        # Using PIL library
-        pillow_image = Image.fromarray(np_image).convert('L')
-
-        qt_image = ImageQt.ImageQt(pillow_image)
-
-        self.image_window.setPixmap(QtGui.QPixmap.fromImage(qt_image))
+        self.image_window.setPixmap(QtGui.QPixmap.fromImage(dicom_file_parser.get_qtimage()))
 
         self.image_title_label.setText(
             f'Body Part: {dicom_file_parser.get_body_part_title()}')
         self.image_number.setText(
-            f'IMG # {dicom_file_parser.get_image_number()}')
+            f'IMG # {dicom_file_parser.get_instance_number()}')
