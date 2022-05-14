@@ -1,8 +1,8 @@
 """
 Instantiating some classes
 """
-import pytest
-from pytestqt.plugin import QtBot
+# import pytest
+# from pytestqt.plugin import QtBot
 from models import dicom_file_parser_model
 from models import main_model
 from controllers import main_controller
@@ -56,16 +56,16 @@ def test_main_controller():
     assert controller.get_config() is not None
 
 
-@pytest.fixture
-def qtbot(request):
-    """
-    Fixture used to create a QtBot instance for using during testing.
+# @pytest.fixture
+# def qtbot(request):
+#     """
+#     Fixture used to create a QtBot instance for using during testing.
 
-    Make sure to call addWidget for each top-level widget you create to ensure
-    that they are properly closed after the test ends.
-    """
-    result = QtBot(request)
-    return result
+#     Make sure to call addWidget for each top-level widget you create to
+#     ensure that they are properly closed after the test ends.
+#     """
+#     result = QtBot(request)
+#     return result
 
 
 # def test_pop_up_window():
