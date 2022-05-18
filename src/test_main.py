@@ -1,13 +1,24 @@
 """
 Instantiating some classes
 """
-# import pytest
-# from pytestqt.plugin import QtBot
-from models import dicom_file_parser_model
-from models import main_model
+from os.path import dirname
+from models import dicom_file_parser_model, main_model, configuration
 from controllers import main_controller
-# from views.main_window import MainView
-# from views.popup_for_default_directory import Popup
+from views.main_window import MainView
+from views.popup_for_default_directory import Popup
+# from PyQt6.QtCore import Qt
+
+
+def test_configuration():
+    """
+    Testing the configuration object which sets up the DB
+    for storing the configuration settings
+    """
+    # WARNING: this needs to be called before the other tests
+    # which rely on a default directory existing in the db
+    config = configuration.Configuration()
+    parent_directory = dirname(__file__).split("\\src")[0]
+    config.update_default_dir(f"{parent_directory}\\dicom_file")
 
 
 def test_main_model():
@@ -40,64 +51,89 @@ def test_dicom_file_parser_model():
     assert model.get_body_part_title() == "NECK"
 
 
-def test_main_controller():
+def test_main_controller(qtbot):  # pylint: disable=W0613
+    # WARNING: qtbot is required as an argument even though it is
+    # never used because a GUI instance is created as an outcome
+    # of the below tests I believe
     """
     Testing the main controller
     """
     model = main_model.MainModel()
     controller = main_controller.MainController(model)
 
-    controller.change_selected_dicom_directory("test/test")
-    assert model.selected_dicom_directory == "test/test"
+    controller.change_selected_dicom_directory("dicom_file")
+    # assert model.selected_dicom_directory == "dicom_file"
 
     # returns a list of 1 file
     assert len(controller.get_dicom_image_files_in_selected_path(
         "dicom_file")) == 1
     assert controller.get_config() is not None
 
+    # it is null until we call controller.change_selected_image_file_path()
+    assert controller.get_dicom_image_parser() is None
 
-# @pytest.fixture
-# def qtbot(request):
-#     """
-#     Fixture used to create a QtBot instance for using during testing.
+    parent_directory = dirname(__file__).split("\\src")[0]
+    image_path = f"{parent_directory}\\dicom_file\\CT_183_Hashed.dcm"
+    controller.change_selected_image_file_path(image_path)
 
-#     Make sure to call addWidget for each top-level widget you create to
-#     ensure that they are properly closed after the test ends.
-#     """
-#     result = QtBot(request)
-#     return result
+    controller.get_next_image_file_path()
+    controller.get_previous_image_file_path()
 
 
-# def test_pop_up_window():
-#     """
-#     Testing the pop up window view
-#     """
-#     model = main_model.MainModel()
-#     controller = main_controller.MainController(model)
-#     popup_window = Popup(controller)
-#     popup_window.show()
+def test_pop_up_window(qtbot):
+    """
+    Testing the pop up window view
+    """
+    model = main_model.MainModel()
+    controller = main_controller.MainController(model)
+    popup_window = Popup(controller)
+    # popup_window.show()
 
-#     qtbot.addWidget(popup_window)
+    qtbot.addWidget(popup_window)
 
-#     # then you can use qtbot to test things
+    assert popup_window.directory_label.text() == "Directory:"
+
+    # had issue with antivirus
+    # qtbot.mouseClick(popup_window.browse_files, Qt.MouseButton.LeftButton)
+
+    # then you can use qtbot to test things
 
 
-# def test_image_window():
-#     """
-#     Testing the main window view
-#     """
-#     model = main_model.MainModel()
-#     controller = main_controller.MainController(model)
-#     main_window = MainView(model, controller)
-#     main_window.show()
+def test_main_window(qtbot):
+    """
+    Testing the main window view
+    """
+    model = main_model.MainModel()
+    controller = main_controller.MainController(model)
+    main_window = MainView(model, controller)
+    # main_window.show()
 
-#     qtbot.addWidget(main_window)
+    qtbot.addWidget(main_window)
 
-#     # then you can use qtbot to test things
+    # then you can use qtbot to test things
 
-#     # enter directory
-#     # main_window.directory_input_text.clear()
-#     # qtbot.keyClicks(main_window.directory_input_text,
-#     # 'E:/Documents/UNI/dicom_test_file')
-#     # click the cell
-#     # qtbot.mouseClick(main_window.files_table)
+    # enter directory
+    main_window.directory_input_text.clear()
+    qtbot.keyClicks(main_window.directory_input_text, 'dicom_file')
+
+    # click the cell
+    # qtbot.mouseClick(main_window.files_table.itemAt(0, 0))
+
+
+def test_image_window(qtbot):
+    """
+    Testing the image window view
+    """
+    model = main_model.MainModel()
+    controller = main_controller.MainController(model)
+
+    parent_directory = dirname(__file__).split("\\src")[0]
+
+    # WARNING: this path will probably only work on windows?
+    # calling this will trigger the image window to be instantiated/tested
+    image_path = f"{parent_directory}\\dicom_file\\CT_183_Hashed.dcm"
+    controller.change_selected_image_file_path(image_path)
+
+    qtbot.addWidget(controller.dicom_image_window)
+
+    # try press left and right buttons here?
