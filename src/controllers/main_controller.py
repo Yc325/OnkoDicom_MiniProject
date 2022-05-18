@@ -4,7 +4,6 @@ Established MainController class
 import os
 import collections
 from PySide6.QtCore import QObject
-import pydicom
 from models.dicom_file_parser_model import DicomFileModel
 from models.configuration import Configuration
 from views.image_window import ImageWindow
@@ -43,7 +42,8 @@ class MainController(QObject):
         # this will emit signal to the Image view to refresh it's data
         self._model.selected_image_file_path = value
 
-        # create ImageWindow() instance using same model
+        # create ImageWindow() instance using same model if it does
+        # not already exist
         if not self.dicom_image_window:
             self.dicom_image_window = ImageWindow(self._model, self)
         self.dicom_image_window.show()
@@ -102,8 +102,9 @@ class MainController(QObject):
         # could be a flaky way of sorting
         dictionary = {}
         for file in filtered_files:
-            if get_type(file) == "CT Image":
-                number = get_instance_number_of_file(file)
+            dicom_parser_instance = DicomFileModel(file)
+            if dicom_parser_instance.get_type() == "CT Image":
+                number = dicom_parser_instance.get_instance_number()
                 dictionary[file] = number
 
         sorted_list_of_tuples = sorted(dictionary.items(), key=lambda x: x[1])
@@ -113,7 +114,7 @@ class MainController(QObject):
 
     def check_preference(self):
         """
-        Checks User Preferences
+        Checks User Preferences from the db
         """
         # checks if user has a default directory save in the db
         directory = self._config.get_default_dir()
@@ -132,41 +133,9 @@ class MainController(QObject):
         """
         pop = Popup(self)
         pop.exec()
-        # pop.show()
 
     def get_config(self):
         """
         Gets the config object
         """
         return self._config
-
-
-# move this function somewhere more relevent
-def get_type(file):
-    """
-    Returns the type of data contained within a DICOM file
-    :return: type, string type of data in DICOM file
-    """
-    dataset = pydicom.dcmread(file)
-
-    elements = {
-        '1.2.840.10008.5.1.4.1.1.481.3': "RT Struct",
-        '1.2.840.10008.5.1.4.1.1.2': "CT Image",
-        '1.2.840.10008.5.1.4.1.1.481.2': "RT Dose",
-        '1.2.840.10008.5.1.4.1.1.481.5': "RT Plan"
-    }
-
-    class_uid = dataset["SOPClassUID"].value
-    # Check to see what type of data the given DICOM file holds
-    if class_uid in elements:
-        return elements[class_uid]
-    return False
-
-
-def get_instance_number_of_file(file):
-    """
-    Retrieves the instance number of a given .dcm file
-    """
-    dataset = pydicom.dcmread(file)
-
-    return int(dataset["InstanceNumber"].value)
