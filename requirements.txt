@@ -1,6 +1,7 @@
 astroid==2.11.4
 atomicwrites==1.4.0
 attrs==21.4.0
+autopep8==1.6.0
 colorama==0.4.4
 coverage==6.3.2
 dill==0.3.4
@@ -26,7 +27,9 @@ PySide6-Addons==6.3.0
 PySide6-Essentials==6.3.0
 pytest==7.1.2
 pytest-cov==3.0.0
+pytest-qt==4.0.2
 shiboken6==6.3.0
+toml==0.10.2
 tomli==2.0.1
-typing_extensions==4.2.0
+typing-extensions==4.2.0
 wrapt==1.14.1
