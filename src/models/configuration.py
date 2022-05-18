@@ -4,12 +4,17 @@ Establishes Database
 import sqlite3
 import os
 from pathlib import Path
+from src.Custom_Logging.logger import custLogger
 
+#call logging
+logging_display = custLogger(name=__name__)
 
 def create_hidden_dir():
     """
     Create the hidden directory
     """
+    # display logging info
+    logging_display.logger.info('create_hidden_dir function called')
     # Path.home() gets user's home directory, its cross-platform
     path = Path.home().joinpath('Secret')
     # check if path actually exists
@@ -26,7 +31,8 @@ class Configuration():
     """
     Configuration Object Used To Interact With Database
     """
-
+    # display logging info
+    logging_display.logger.info('Class created')
     def __init__(self, db_file='.dicom.db'):
         self.db_path = create_hidden_dir().joinpath(db_file)
         self.set_up_db()
@@ -35,6 +41,8 @@ class Configuration():
         """
         Create database within the hidden directory
         """
+        # display logging info
+        logging_display.logger.info('set_up_db function called')
         # Connection object to represent database
         conn = sqlite3.connect(self.db_path)
         # creates database if it doesn't already exist
@@ -51,6 +59,8 @@ class Configuration():
         """
         Retrieves default directory from database
         """
+        # display logging info
+        logging_display.logger.info('get_default_dir function called')
         # Connection object to represent database
         conn = sqlite3.connect(self.db_path)
         # creates cursor
@@ -66,6 +76,8 @@ class Configuration():
         """
         Adds/updates default directory
         """
+        # display logging info
+        logging_display.logger.info('update_default_dir function called')
         # Connection object to represent database
         conn = sqlite3.connect(self.db_path)
         # creates cursor

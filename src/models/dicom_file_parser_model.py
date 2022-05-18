@@ -12,13 +12,17 @@ from PySide6 import QtGui
 # need to clean up our imports/dependencies as it is very fragile
 sys.modules['PyQt6.QtGui'] = QtGui
 from PIL import Image, ImageQt  # noqa: E402
+from src.Custom_Logging.logger import custLogger
 
+#call logging
+logging_display = custLogger(name=__name__)
 
 class DicomFileModel:
     """
     A model class that handles all the processing of the dicom files
     """
-
+    # display logging info
+    logging_display.logger.info('Class created')
     def __init__(self, path):
         dataset = pydicom.dcmread(path)
 
@@ -34,14 +38,20 @@ class DicomFileModel:
 
     def get_instance_number(self):
         """Gets the file instance number"""
+        # display logging info
+        logging_display.logger.info('get_instance_number function called')
         return self.instance_number
 
     def get_body_part_title(self):
         """Gets the body part title"""
+        # display logging info
+        logging_display.logger.info('get_body_part_title function called')
         return self.body_part_title
 
     def get_qtimage(self):
         """Gets the qt_image"""
+        # display logging info
+        logging_display.logger.info('get_qtimage function called')
         # Try turn pixel data into image
         # from
         # https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_PIL.py
@@ -76,6 +86,8 @@ class DicomFileModel:
         Returns the type of data contained within a DICOM file
         :return: type, string type of data in DICOM file
         """
+        # display logging info
+        logging_display.logger.info('get_type function called')
         elements = {
             '1.2.840.10008.5.1.4.1.1.481.3': "RT Struct",
             '1.2.840.10008.5.1.4.1.1.2': "CT Image",

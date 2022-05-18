@@ -8,7 +8,10 @@ from PySide6.QtWidgets import (QLabel,
                                QGridLayout,
                                )
 from PySide6 import QtCore, QtGui
+from src.Custom_Logging.logger import custLogger
 
+#call logging
+logging_display = custLogger(name=__name__)
 
 class ImageWindow(QWidget):
     """
@@ -16,6 +19,8 @@ class ImageWindow(QWidget):
     arrows to navigate through multiple images,
     and name and number of image file.
     """
+    # display logging info
+    logging_display.logger.info('Class created')
 
     def __init__(self, model, main_controller):
         super().__init__()
@@ -60,6 +65,9 @@ class ImageWindow(QWidget):
         Refreshes all the data on the image window with reference to the
         DicomFileParserModel stored on the MainController
         """
+        # display logging info
+        logging_display.logger.info('show_data function called')
+
         dicom_file_parser = self._main_controller.get_dicom_image_parser()
 
         self.image_window.setPixmap(

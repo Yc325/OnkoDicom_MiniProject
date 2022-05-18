@@ -8,12 +8,16 @@ from models.dicom_file_parser_model import DicomFileModel
 from models.configuration import Configuration
 from views.image_window import ImageWindow
 from views.popup_for_default_directory import Popup
+from src.Custom_Logging.logger import custLogger
 
+#call logging
+logging_display = custLogger(name=__name__)
 
 class MainController(QObject):
     """
     Main controller that handles application logic
     """
+    logging_display.logger.info('Class created')
 
     def __init__(self, model):
         super().__init__()
@@ -27,15 +31,20 @@ class MainController(QObject):
         """
         Changes selected dicom directory in model
         """
-
+        # display logging info
+        logging_display.logger.info('change_selected_dicom_directory function called')
         # check if it is a valid path first
         if os.path.exists(value):
             self._model.selected_dicom_directory = value
+        else:
+            logging_display.logger.error('Function change_selected_dicom_directory did not find a path')
 
     def change_selected_image_file_path(self, value):
         """
         changes the selected image file path
         """
+        # display logging info
+        logging_display.logger.info('change_selected_image_file_path function called')
         # WARNING: the dicom_file_parser must be set before the model
         # is changed. This is because the model change will trigger
         # a refresh in the ImageWindow's data which will reference the
@@ -55,6 +64,9 @@ class MainController(QObject):
         """
         Sets the previous image path in the directory in the model
         """
+        # display logging info
+        logging_display.logger.info('get_previous_image_file_path function called')
+
         current_image_file_path = self._model.selected_image_file_path
 
         files = self.get_dicom_image_files_in_selected_path()
@@ -72,6 +84,9 @@ class MainController(QObject):
         """
         Sets the next image path in the directory in the model
         """
+        # display logging info
+        logging_display.logger.info('get_next_image_file_path function called')
+
         current_image_file_path = self._model.selected_image_file_path
 
         files = self.get_dicom_image_files_in_selected_path()
@@ -89,6 +104,8 @@ class MainController(QObject):
         """
         Returns the dicom parser object on the controller
         """
+        # display logging info
+        logging_display.logger.info('get_dicom_image_parser function called')
         return self.dicom_file_parser
 
     def get_dicom_image_files_in_selected_path(self, path=None):
@@ -96,6 +113,8 @@ class MainController(QObject):
         Returns a sorted list of DICOM image files in the
         current selected directory
         """
+        # display logging info
+        logging_display.logger.info('get_dicom_image_files_in_selected_path function called')
         files = []
 
         if path:
@@ -132,6 +151,8 @@ class MainController(QObject):
         prompts the user to select one if none
         already exists
         """
+        # display logging info
+        logging_display.logger.info('check_preference function called')
         # checks if user has a default directory save in the db
         directory = self._config.get_default_dir()
         if directory is None:
@@ -147,6 +168,8 @@ class MainController(QObject):
         """
         Opens PopUp Window
         """
+        # display logging info
+        logging_display.logger.info('browse_for_dicom_file_directory function called')
         pop = Popup(self)
         pop.exec()
 
@@ -154,4 +177,6 @@ class MainController(QObject):
         """
         Gets the config object
         """
+        # display logging info
+        logging_display.logger.info('get_config function called')
         return self._config
