@@ -4,7 +4,7 @@ Establishes Database
 import sqlite3
 import os
 from pathlib import Path
-from src.Custom_Logging.logger import custLogger
+from Custom_Logging.logger import custLogger
 
 #call logging
 logging_display = custLogger(name=__name__)
