@@ -15,8 +15,6 @@ from PIL import Image, ImageQt  # noqa: E402
 # need to clean up our imports/dependencies as it is very fragile
 sys.modules['PyQt6.QtGui'] = QtGui
 
-
-
 # call logging
 logging_display = CustLogger(name=__name__)
 
