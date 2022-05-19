@@ -4,25 +4,31 @@ and having easier accessibility
 """
 # pylint: disable=E1101
 # pylint: disable=C0413
+# pylint: disable=C0411
 import sys
 import numpy as np
 import pydicom
 from PySide6 import QtGui
+from Custom_Logging.logger import CustLogger
+from PIL import Image, ImageQt  # noqa: E402
 # WARNING: this is required because of ImageQt backend issues
 # need to clean up our imports/dependencies as it is very fragile
 sys.modules['PyQt6.QtGui'] = QtGui
-from PIL import Image, ImageQt  # noqa: E402
-from Custom_Logging.logger import CustLogger
 
-#call logging
+
+
+# call logging
 logging_display = CustLogger(name=__name__)
+
 
 class DicomFileModel:
     """
     A model class that handles all the processing of the dicom files
     """
+
     # display logging info
     logging_display.logger.info('Class created')
+
     def __init__(self, path):
         dataset = pydicom.dcmread(path)
 
@@ -61,10 +67,10 @@ class DicomFileModel:
         win_center = dataset['WindowCenter']
 
         if (win_width is None) or (win_center is None) or (dataset is None):
-            logging_display.logger.error("Values win_width & win_center: %s %s"
-                                         , win_width
-                                         , win_center)
-
+            logging_display.logger.error("Values win_width & "
+                                         "win_center: %s %s",
+                                         win_width,
+                                         win_center)
 
         window = int(
             win_width.value[0] if win_width.VM > 1 else win_width.value)
@@ -105,6 +111,6 @@ class DicomFileModel:
         # Check to see what type of data the given DICOM file holds
         if class_uid in elements:
             return elements[class_uid]
-        logging_display.logger.warning("Does not support this file type: %s"
-                                       , class_uid)
+        logging_display.logger.warning("Does not support this file type: %s",
+                                       class_uid)
         return False

@@ -10,8 +10,9 @@ from PySide6.QtWidgets import (QLabel,
 from PySide6 import QtCore, QtGui
 from Custom_Logging.logger import CustLogger
 
-#call logging
+# call logging
 logging_display = CustLogger(name=__name__)
+
 
 class ImageWindow(QWidget):
     """

@@ -6,19 +6,22 @@ import os
 from pathlib import Path
 from Custom_Logging.logger import CustLogger
 
+# pylint: disable=W0703
+
 # call logging
 logging_display = CustLogger(name=__name__)
+
 
 def create_hidden_dir():
     """
     Create the hidden directory
     """
-    # display logging info
-    logging_display.logger.info('create_hidden_dir function called')
     # Path.home() gets user's home directory, its cross-platform
     path = Path.home().joinpath('Secret')
     # check if path actually exists
     if not os.path.exists(path):
+        # display logging info
+        logging_display.logger.info('create_hidden_dir function called')
         print(path)
         # creates new directory
         os.mkdir(path)
@@ -32,7 +35,9 @@ class Configuration():
     Configuration Object Used To Interact With Database
     """
     # display logging info
+
     logging_display.logger.info('Class created')
+
     def __init__(self, db_file='.dicom.db'):
         self.db_path = create_hidden_dir().joinpath(db_file)
         self.set_up_db()
@@ -41,10 +46,15 @@ class Configuration():
         """
         Create database within the hidden directory
         """
+
         # display logging info
         logging_display.logger.info('set_up_db function called')
         # Connection object to represent database
-        conn = sqlite3.connect(self.db_path)
+        try:
+            conn = sqlite3.connect(self.db_path)
+        except BaseException:
+            logging_display.logger.exception("connection object failed")
+
         # creates database if it doesn't already exist
         conn.execute("""
                 CREATE TABLE IF NOT EXISTS CONFIGURATION (
@@ -79,19 +89,24 @@ class Configuration():
         # display logging info
         logging_display.logger.info('update_default_dir function called')
         # Connection object to represent database
-        conn = sqlite3.connect(self.db_path)
-        # creates cursor
-        cursor = conn.cursor()
-        cursor.execute("SELECT COUNT(*) FROM CONFIGURATION;")
-        # check if file exists
-        if cursor.fetchone()[0] == 0:
-            # if no files exist than it will insert the default path
-            conn.execute(f"""INSERT INTO configuration (id, default_dir)
-                                VALUES (1, "{new_dir}");""")
-        else:
-            # if files exist than it will update the default path
-            conn.execute(f"""UPDATE CONFIGURATION
-                            SET default_dir = "{new_dir}"
-                            WHERE id = 1;""")
-        conn.commit()
-        conn.close()
+        try:
+            conn = sqlite3.connect(self.db_path)
+            # creates cursor
+            cursor = conn.cursor()
+            cursor.execute("SELECT COUNT(*) FROM CONFIGURATION;")
+            # check if file exists
+            if cursor.fetchone()[0] == 0:
+                # if no files exist than it will insert the default path
+                logging_display.logger.warning("No default directory")
+                conn.execute(f"""INSERT INTO configuration (id, default_dir)
+                                    VALUES (1, "{new_dir}");""")
+            else:
+                # if files exist than it will update the default path
+                conn.execute(f"""UPDATE CONFIGURATION
+                                SET default_dir = "{new_dir}"
+                                WHERE id = 1;""")
+            conn.commit()
+            conn.close()
+
+        except BaseException:
+            logging_display.logger.exception("DB was corrupted")

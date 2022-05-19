@@ -17,8 +17,9 @@ from PySide6.QtWidgets import (
 # pylint: disable = E1101
 from Custom_Logging.logger import CustLogger
 
-#call logging
+# call logging
 logging_display = CustLogger(name=__name__)
+
 
 class MainView(QMainWindow):
     """
