@@ -26,6 +26,12 @@ class App(QApplication):
 
 
 if __name__ == '__main__':
+    # logging_display.logger.info("info") #Add info to display anything what it is called
+    # logging_display.logger.critical("critical") #like critical error
+    # logging_display.logger.debug("debug") #debug errorc
+    # logging_display.logger.error("error") #errorr
+    # logging_display.logger.exception("exception") #exception
+    # logging_display.logger.warning("Warning") #warning
     app = App(sys.argv)
     app.exec()
     sys.exit(app.exec_())

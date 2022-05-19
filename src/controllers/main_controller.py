@@ -96,6 +96,7 @@ class MainController(QObject):
             index = (files.index(current_image_file_path) + 1) % len(files)
             new_path = f"{files[index]}"
             self.change_selected_image_file_path(new_path)
+
         except ValueError:
             # log error: ie. file not in path
             logging_display.logger.exception('get_next_image_file_path - File not in a path')

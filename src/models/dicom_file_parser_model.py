@@ -60,6 +60,10 @@ class DicomFileModel:
         win_width = dataset['WindowWidth']
         win_center = dataset['WindowCenter']
 
+        if (win_width == None) or (win_center == None) or (dataset == None):
+            logging_display.logger.error(f"Values win_width & win_center: {win_width} & {win_center}")
+
+
         window = int(
             win_width.value[0] if win_width.VM > 1 else win_width.value)
         level = int(
@@ -99,4 +103,6 @@ class DicomFileModel:
         # Check to see what type of data the given DICOM file holds
         if class_uid in elements:
             return elements[class_uid]
-        return False
+        else:
+            logging_display.logger.warning(f"Does not support this file type: {class_uid}")
+            return False
