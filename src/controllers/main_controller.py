@@ -77,6 +77,7 @@ class MainController(QObject):
             self.change_selected_image_file_path(new_path)
         except ValueError:
             # log error: ie. file not in path
+            logging_display.logger.exception('get_previous_image_file_path - File not in a path')
             # should handle this better too?
             return
 
@@ -97,6 +98,7 @@ class MainController(QObject):
             self.change_selected_image_file_path(new_path)
         except ValueError:
             # log error: ie. file not in path
+            logging_display.logger.exception('get_next_image_file_path - File not in a path')
             # should handle this better too?
             return
 
