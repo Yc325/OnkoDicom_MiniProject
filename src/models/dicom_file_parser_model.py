@@ -12,7 +12,7 @@ from PySide6 import QtGui
 # need to clean up our imports/dependencies as it is very fragile
 sys.modules['PyQt6.QtGui'] = QtGui
 from PIL import Image, ImageQt  # noqa: E402
-from src.Custom_Logging.logger import custLogger
+from Custom_Logging.logger import custLogger
 
 #call logging
 logging_display = custLogger(name=__name__)
