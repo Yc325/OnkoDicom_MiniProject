@@ -4,10 +4,10 @@ Establishes Database
 import sqlite3
 import os
 from pathlib import Path
-from Custom_Logging.logger import custLogger
+from Custom_Logging.logger import CustLogger
 
-#call logging
-logging_display = custLogger(name=__name__)
+# call logging
+logging_display = CustLogger(name=__name__)
 
 def create_hidden_dir():
     """

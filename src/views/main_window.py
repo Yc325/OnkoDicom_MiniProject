@@ -15,10 +15,10 @@ from PySide6.QtWidgets import (
     QLineEdit,
 )
 # pylint: disable = E1101
-from Custom_Logging.logger import custLogger
+from Custom_Logging.logger import CustLogger
 
 #call logging
-logging_display = custLogger(name=__name__)
+logging_display = CustLogger(name=__name__)
 
 class MainView(QMainWindow):
     """

@@ -12,10 +12,10 @@ from PySide6 import QtGui
 # need to clean up our imports/dependencies as it is very fragile
 sys.modules['PyQt6.QtGui'] = QtGui
 from PIL import Image, ImageQt  # noqa: E402
-from Custom_Logging.logger import custLogger
+from Custom_Logging.logger import CustLogger
 
 #call logging
-logging_display = custLogger(name=__name__)
+logging_display = CustLogger(name=__name__)
 
 class DicomFileModel:
     """
@@ -60,8 +60,10 @@ class DicomFileModel:
         win_width = dataset['WindowWidth']
         win_center = dataset['WindowCenter']
 
-        if (win_width == None) or (win_center == None) or (dataset == None):
-            logging_display.logger.error(f"Values win_width & win_center: {win_width} & {win_center}")
+        if (win_width is None) or (win_center is None) or (dataset is None):
+            logging_display.logger.error("Values win_width & win_center: %s %s"
+                                         , win_width
+                                         , win_center)
 
 
         window = int(
@@ -103,6 +105,6 @@ class DicomFileModel:
         # Check to see what type of data the given DICOM file holds
         if class_uid in elements:
             return elements[class_uid]
-        else:
-            logging_display.logger.warning(f"Does not support this file type: {class_uid}")
-            return False
+        logging_display.logger.warning("Does not support this file type: %s"
+                                       , class_uid)
+        return False

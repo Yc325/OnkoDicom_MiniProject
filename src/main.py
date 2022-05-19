@@ -7,9 +7,10 @@ from PyQt6.QtWidgets import QApplication
 from models.main_model import MainModel
 from controllers.main_controller import MainController
 from views.main_window import MainView
-from Custom_Logging.logger import custLogger
-#call logging
-logging_display = custLogger(name=__name__)
+from Custom_Logging.logger import CustLogger
+# call logging
+logging_display = CustLogger(name=__name__)
+
 
 class App(QApplication):
     """
@@ -17,6 +18,7 @@ class App(QApplication):
     """
     # display logging info
     logging_display.logger.info('Class created')
+
     def __init__(self, sys_argv):
         super().__init__(sys_argv)
         self.model = MainModel()
@@ -26,12 +28,18 @@ class App(QApplication):
 
 
 if __name__ == '__main__':
-    # logging_display.logger.info("info") #Add info to display anything what it is called
-    # logging_display.logger.critical("critical") #like critical error
-    # logging_display.logger.debug("debug") #debug errorc
-    # logging_display.logger.error("error") #errorr
-    # logging_display.logger.exception("exception") #exception
-    # logging_display.logger.warning("Warning") #warning
+    # Add info to display anything what it is called
+    # logging_display.logger.info("info")
+    # like critical error
+    # logging_display.logger.critical("critical")
+    # debug
+    # logging_display.logger.debug("debug")
+    # error
+    # logging_display.logger.error("error")
+    # exception
+    # logging_display.logger.exception("exception")
+    # warning
+    # logging_display.logger.warning("Warning")
     app = App(sys.argv)
     app.exec()
     sys.exit(app.exec_())

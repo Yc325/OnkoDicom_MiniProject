@@ -1,9 +1,9 @@
 """Declares MainModel for the application"""
 from PyQt6.QtCore import QObject, pyqtSignal
-from Custom_Logging.logger import custLogger
+from Custom_Logging.logger import CustLogger
 
-#call logging
-logging_display = custLogger(name=__name__)
+# call logging
+logging_display = CustLogger(name=__name__)
 
 class MainModel(QObject):
     """

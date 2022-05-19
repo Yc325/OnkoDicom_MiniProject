@@ -8,10 +8,11 @@ from models.dicom_file_parser_model import DicomFileModel
 from models.configuration import Configuration
 from views.image_window import ImageWindow
 from views.popup_for_default_directory import Popup
-from Custom_Logging.logger import custLogger
+from Custom_Logging.logger import CustLogger
 
-#call logging
-logging_display = custLogger(name=__name__)
+# call logging
+logging_display = CustLogger(name=__name__)
+
 
 class MainController(QObject):
     """
@@ -32,19 +33,23 @@ class MainController(QObject):
         Changes selected dicom directory in model
         """
         # display logging info
-        logging_display.logger.info('change_selected_dicom_directory function called')
+        logging_display.logger.info('change_selected_dicom_directory '
+                                    'function called')
         # check if it is a valid path first
         if os.path.exists(value):
             self._model.selected_dicom_directory = value
         else:
-            logging_display.logger.error('Function change_selected_dicom_directory did not find a path')
+            logging_display.logger.error('Function '
+                                         'change_selected_dicom_directory'
+                                         ' did not find a path')
 
     def change_selected_image_file_path(self, value):
         """
         changes the selected image file path
         """
         # display logging info
-        logging_display.logger.info('change_selected_image_file_path function called')
+        logging_display.logger.info('change_selected_image_file_path'
+                                    ' function called')
         # WARNING: the dicom_file_parser must be set before the model
         # is changed. This is because the model change will trigger
         # a refresh in the ImageWindow's data which will reference the
@@ -65,7 +70,8 @@ class MainController(QObject):
         Sets the previous image path in the directory in the model
         """
         # display logging info
-        logging_display.logger.info('get_previous_image_file_path function called')
+        logging_display.logger.info('get_previous_image_file_path'
+                                    ' function called')
 
         current_image_file_path = self._model.selected_image_file_path
 
@@ -77,7 +83,8 @@ class MainController(QObject):
             self.change_selected_image_file_path(new_path)
         except ValueError:
             # log error: ie. file not in path
-            logging_display.logger.exception('get_previous_image_file_path - File not in a path')
+            logging_display.logger.exception('get_previous_image_file_path '
+                                             '- File not in a path')
             # should handle this better too?
             return
 
@@ -99,7 +106,9 @@ class MainController(QObject):
 
         except ValueError:
             # log error: ie. file not in path
-            logging_display.logger.exception('get_next_image_file_path - File not in a path')
+            logging_display.logger.exception('get_next_image_file_path '
+                                             '- '
+                                             'File not in a path')
             # should handle this better too?
             return
 
@@ -113,11 +122,13 @@ class MainController(QObject):
 
     def get_dicom_image_files_in_selected_path(self, path=None):
         """
-        Returns a sorted list of DICOM image files in the
+        Returns a sorted list of DICOM
+         image files in the
         current selected directory
         """
         # display logging info
-        logging_display.logger.info('get_dicom_image_files_in_selected_path function called')
+        logging_display.logger.info('get_dicom_image_files_in_selected_path'
+                                    ' function called')
         files = []
 
         if path:
@@ -172,7 +183,8 @@ class MainController(QObject):
         Opens PopUp Window
         """
         # display logging info
-        logging_display.logger.info('browse_for_dicom_file_directory function called')
+        logging_display.logger.info('browse_for_dicom_file_directory'
+                                    ' function called')
         pop = Popup(self)
         pop.exec()
 
