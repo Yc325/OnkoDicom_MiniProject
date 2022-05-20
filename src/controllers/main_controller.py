@@ -76,7 +76,7 @@ class MainController(QObject):
         # check if it is a valid path first
         if os.path.exists(value):
             self._model.selected_dicom_directory = value
-            self._model.sorted_list_of_image_files = self.sort_list_of_files(value)
+            self._model.sorted_list_of_image_files = self.sort_list_of_files(value)  # noqa: E501
         else:
             logging_display.logger.error('Function '
                                          'change_selected_dicom_directory'
@@ -160,6 +160,9 @@ class MainController(QObject):
         return self.dicom_file_parser
 
     def get_dicom_image_files_in_selected_path(self):
+        """
+        Getter for the current list of image files in the model
+        """
         return self._model.sorted_list_of_image_files
 
     def check_preference(self):
