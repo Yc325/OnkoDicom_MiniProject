@@ -5,15 +5,17 @@ and having easier accessibility
 # pylint: disable=E1101
 # pylint: disable=C0413
 # pylint: disable=C0411
+
 import sys
 import numpy as np
 import pydicom
 from PySide6 import QtGui
 from Custom_Logging.logger import CustLogger
-from PIL import Image, ImageQt  # noqa: E402
+
 # WARNING: this is required because of ImageQt backend issues
 # need to clean up our imports/dependencies as it is very fragile
 sys.modules['PyQt6.QtGui'] = QtGui
+from PIL import Image, ImageQt # noqa: E402
 
 # call logging
 logging_display = CustLogger(name=__name__)
@@ -37,8 +39,13 @@ class DicomFileModel:
 
         self.dataset = dataset
         self.all_tags = all_tags
-        self.body_part_title = dataset['BodyPartExamined'].value
-        self.instance_number = dataset['InstanceNumber'].value
+
+        try:
+            self.body_part_title = dataset['BodyPartExamined'].value
+            self.instance_number = dataset['InstanceNumber'].value
+        except KeyError:
+            self.body_part_title = ""
+            self.instance_number = 0
 
     def get_instance_number(self):
         """Gets the file instance number"""
