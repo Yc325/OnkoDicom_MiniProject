@@ -28,6 +28,44 @@ class MainController(QObject):
         self.dicom_file_parser = None
         self._config = Configuration()
 
+    def sort_list_of_files(self, path=None):
+        """
+        Returns a sorted list of DICOM
+         image files in the
+        current selected directory
+        """
+        # display logging info
+        logging_display.logger.info('get_dicom_image_files_in_selected_path'
+                                    ' function called')
+        files = []
+
+        if path:
+            current_dir = path
+        else:
+            current_dir = self._model.selected_dicom_directory
+        files = os.listdir(current_dir)
+        filtered_files = []
+
+        # filter by .dcm file_type
+        for file in files:
+            if file.endswith(".dcm"):
+                filtered_files.append(f"{current_dir}/{file}")
+
+        # sort in number order?
+        # Not sure if this a universal naming standard though so
+        # could be a flaky way of sorting
+        dictionary = {}
+        for file in filtered_files:
+            dicom_parser_instance = DicomFileModel(file)
+            if dicom_parser_instance.get_type() == "CT Image":
+                number = dicom_parser_instance.get_instance_number()
+                dictionary[file] = number
+
+        sorted_list_of_tuples = sorted(dictionary.items(), key=lambda x: x[1])
+        sorted_dict = collections.OrderedDict(sorted_list_of_tuples)
+
+        return list(sorted_dict.keys())
+
     def change_selected_dicom_directory(self, value):
         """
         Changes selected dicom directory in model
@@ -38,6 +76,7 @@ class MainController(QObject):
         # check if it is a valid path first
         if os.path.exists(value):
             self._model.selected_dicom_directory = value
+            self._model.sorted_list_of_image_files = self.sort_list_of_files(value)
         else:
             logging_display.logger.error('Function '
                                          'change_selected_dicom_directory'
@@ -120,43 +159,8 @@ class MainController(QObject):
         logging_display.logger.info('get_dicom_image_parser function called')
         return self.dicom_file_parser
 
-    def get_dicom_image_files_in_selected_path(self, path=None):
-        """
-        Returns a sorted list of DICOM
-         image files in the
-        current selected directory
-        """
-        # display logging info
-        logging_display.logger.info('get_dicom_image_files_in_selected_path'
-                                    ' function called')
-        files = []
-
-        if path:
-            current_dir = path
-        else:
-            current_dir = self._model.selected_dicom_directory
-        files = os.listdir(current_dir)
-        filtered_files = []
-
-        # filter by .dcm file_type
-        for file in files:
-            if file.endswith(".dcm"):
-                filtered_files.append(f"{current_dir}/{file}")
-
-        # sort in number order?
-        # Not sure if this a universal naming standard though so
-        # could be a flaky way of sorting
-        dictionary = {}
-        for file in filtered_files:
-            dicom_parser_instance = DicomFileModel(file)
-            if dicom_parser_instance.get_type() == "CT Image":
-                number = dicom_parser_instance.get_instance_number()
-                dictionary[file] = number
-
-        sorted_list_of_tuples = sorted(dictionary.items(), key=lambda x: x[1])
-        sorted_dict = collections.OrderedDict(sorted_list_of_tuples)
-
-        return list(sorted_dict.keys())
+    def get_dicom_image_files_in_selected_path(self):
+        return self._model.sorted_list_of_image_files
 
     def check_preference(self):
         """

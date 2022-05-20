@@ -101,8 +101,7 @@ class MainView(QMainWindow):
         self.directory_input_text.setText(path)
 
         self.files_table.setRowCount(0)
-        files = self._main_controller.get_dicom_image_files_in_selected_path(
-            path)
+        files = self._main_controller.get_dicom_image_files_in_selected_path()
 
         for absolute_path in files:
             current_image_file_size = os.path.getsize(absolute_path)

@@ -21,6 +21,7 @@ class MainModel(QObject):
 
         self._selected_dicom_directory = ""
         self._selected_image_file_path = ""
+        self._sorted_list_of_image_files = []
 
     @property
     def selected_image_file_path(self):
@@ -57,3 +58,20 @@ class MainModel(QObject):
                                     'function setter called')
         self._selected_dicom_directory = value
         self.selected_dicom_directory_changed.emit(value)
+
+    @property
+    def sorted_list_of_image_files(self):
+        """
+        Getter for the selected dicom directory
+        """
+        # display logging info
+        logging_display.logger.info('sorted_list_of_image_files '
+                                    'function property called')
+        return self._sorted_list_of_image_files
+
+    @sorted_list_of_image_files.setter
+    def sorted_list_of_image_files(self, value):
+        # display logging info
+        logging_display.logger.info('sorted_list_of_image_files '
+                                    'function setter called')
+        self._sorted_list_of_image_files = value
