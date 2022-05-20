@@ -10,10 +10,10 @@ import numpy as np
 import pydicom
 from PySide6 import QtGui
 from Custom_Logging.logger import CustLogger
-from PIL import Image, ImageQt  # noqa: E402
 # WARNING: this is required because of ImageQt backend issues
 # need to clean up our imports/dependencies as it is very fragile
 sys.modules['PyQt6.QtGui'] = QtGui
+from PIL import Image, ImageQt  # noqa: E402
 
 # call logging
 logging_display = CustLogger(name=__name__)
