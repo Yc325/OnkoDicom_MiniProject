@@ -5,7 +5,6 @@ and having easier accessibility
 # pylint: disable=E1101
 # pylint: disable=C0413
 # pylint: disable=C0411
-
 import sys
 import numpy as np
 import pydicom
