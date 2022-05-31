@@ -108,7 +108,7 @@ class MainController(QObject):
         """Sets the currently selected image file path"""
         logging_display.logger.info('update_image_file_path'
                                     ' function called.')
-        logging_display.logger.debug(f' Arguments: "value": {value}')
+        logging_display.logger.debug(' Arguments: "value":%s', value)
 
         files = self.get_dicom_image_files_in_selected_path()
 
