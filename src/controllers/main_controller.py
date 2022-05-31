@@ -8,7 +8,7 @@ from models.dicom_file_parser_model import DicomFileModel
 from models.configuration import Configuration
 from views.image_window import ImageWindow
 from views.popup_for_default_directory import Popup
-from Custom_Logging.logger import CustLogger
+from custom_logging.logger import CustLogger
 
 # call logging
 logging_display = CustLogger(name=__name__)

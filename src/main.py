@@ -7,8 +7,7 @@ from PyQt6.QtWidgets import QApplication
 from models.main_model import MainModel
 from controllers.main_controller import MainController
 from views.main_window import MainView
-from Custom_Logging.logger import CustLogger
-# call logging
+from custom_logging.logger import CustLogger
 logging_display = CustLogger(name=__name__)
 
 

@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (
     QLabel,
     QHBoxLayout)
 # pylint: disable = E1101
-from Custom_Logging.logger import CustLogger
+from custom_logging.logger import CustLogger
 
 # call logging
 logging_display = CustLogger(name=__name__)

@@ -9,7 +9,7 @@ import sys
 import numpy as np
 import pydicom
 from PySide6 import QtGui
-from Custom_Logging.logger import CustLogger
+from custom_logging.logger import CustLogger
 
 # WARNING: this is required because of ImageQt backend issues
 # need to clean up our imports/dependencies as it is very fragile

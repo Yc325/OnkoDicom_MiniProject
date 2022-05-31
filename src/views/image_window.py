@@ -8,7 +8,7 @@ from PySide6.QtWidgets import (QLabel,
                                QGridLayout,
                                )
 from PySide6 import QtCore, QtGui
-from Custom_Logging.logger import CustLogger
+from custom_logging.logger import CustLogger
 
 # call logging
 logging_display = CustLogger(name=__name__)
