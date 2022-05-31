@@ -40,4 +40,4 @@ jobs:
         pycodestyle --show-source --show-pep8 src/
     - name: Produce pytest-cov report
       run: |
-        pytest --cov=src/models --cov=src/controllers --cov=src/main.py --cov=src/views
+        pytest --cov=src
