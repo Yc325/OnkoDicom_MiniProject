@@ -104,11 +104,32 @@ class MainController(QObject):
             self.dicom_image_window = ImageWindow(self._model, self)
         self.dicom_image_window.show()
 
+    def update_image_file_path(self, value: int):
+        """Sets the currently selected image file path"""
+        logging_display.logger.info('update_image_file_path'
+                                    ' function called.')
+        logging_display.logger.debug(' Arguments: "value":%s', value)
+
+        files = self.get_dicom_image_files_in_selected_path()
+
+        self.dicom_image_window.slider.setMinimum(0)
+        self.dicom_image_window.slider.setMaximum(len(files)-1)
+
+        try:
+            index = value
+            new_path = f"{files[index]}"
+            self.change_selected_image_file_path(new_path)
+        except ValueError:
+            # log error: ie. file not in path
+            logging_display.logger.exception('get_previous_image_file_path '
+                                             '- File not in a path')
+            # should handle this better too?
+            return
+
     def get_previous_image_file_path(self):
         """
         Sets the previous image path in the directory in the model
         """
-        # display logging info
         logging_display.logger.info('get_previous_image_file_path'
                                     ' function called')
 

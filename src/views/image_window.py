@@ -3,7 +3,7 @@ Declares class for ImageWindow
 """
 # pylint: disable=E1101
 from PySide6.QtWidgets import (QLabel,
-                               QPushButton,
+                               QSlider,
                                QWidget,
                                QGridLayout,
                                )
@@ -35,24 +35,19 @@ class ImageWindow(QWidget):
 
         self.show_data()
 
-        self.button_action_left = QPushButton(None)
-        self.button_action_left.setIcon(
-            QtGui.QIcon("./src/icons/arrow-180-medium.png"))
-        self.button_action_left.clicked.connect(
-            self._main_controller.get_previous_image_file_path)
-
-        self.button_action_right = QPushButton(None)
-        self.button_action_right.setIcon(
-            QtGui.QIcon("./src/icons/arrow-000-medium.png"))
-        self.button_action_right.clicked.connect(
-            self._main_controller.get_next_image_file_path)
+        self.slider = QSlider(self, QtCore.Qt.Horizontal)
+        self.slider.setOrientation(QtCore.Qt.Horizontal)
+        self.slider.sliderMoved.connect(
+            lambda: self._main_controller.update_image_file_path(
+                self.slider.value()
+                )
+            )
 
         layout = QGridLayout()
         layout.addWidget(self.image_number, 1, 0, 1, 5, QtCore.Qt.AlignCenter)
         layout.addWidget(self.image_title_label, 3, 0,
                          1, 5, QtCore.Qt.AlignCenter)
-        layout.addWidget(self.button_action_left, 2, 0)
-        layout.addWidget(self.button_action_right, 2, 4)
+        layout.addWidget(self.slider, 2, 0)
         layout.addWidget(self.image_window, 4, 0, 4, 5, QtCore.Qt.AlignCenter)
 
         self.setLayout(layout)
@@ -66,7 +61,6 @@ class ImageWindow(QWidget):
         Refreshes all the data on the image window with reference to the
         DicomFileParserModel stored on the MainController
         """
-        # display logging info
         logging_display.logger.info('show_data function called')
 
         dicom_file_parser = self._main_controller.get_dicom_image_parser()
