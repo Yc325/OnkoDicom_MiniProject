@@ -67,32 +67,10 @@ class DicomFileModel:
         # https://github.com/pydicom/contrib-pydicom/blob/master/viewers/pydicom_PIL.py
         dataset = self.dataset
 
-        win_width = dataset['WindowWidth']
-        win_center = dataset['WindowCenter']
-
-        if (win_width is None) or (win_center is None) or (dataset is None):
-            logging_display.logger.error("Values win_width & "
-                                         "win_center: %s %s",
-                                         win_width,
-                                         win_center)
-
-        window = int(
-            win_width.value[0] if win_width.VM > 1 else win_width.value)
-        level = int(
-            win_center.value[0] if win_center.VM > 1 else win_center.value)
-        # Takes Data Value if IMG (pixels)
-        data = dataset.pixel_array
-        # using numpy library
-        np_image = np.piecewise(data,
-                                [data <= (level - 0.5 - (window - 1) / 2),
-                                 data > (level - 0.5 + (window - 1) / 2)],
-                                [0,
-                                 255,
-                                 lambda data: ((data - (level - 0.5)) /
-                                               (window - 1) + 0.5)*(255 - 0)])
-
-        # Using PIL library
-        pillow_image = Image.fromarray(np_image).convert('L')
+        arr = dataset.pixel_array.astype(float)
+        rescaled_im = (np.maximum(arr, 0) / arr.max()) * 255
+        final_image = np.uint8(rescaled_im)
+        pillow_image = Image.fromarray(final_image)
 
         return ImageQt.ImageQt(pillow_image)
 
