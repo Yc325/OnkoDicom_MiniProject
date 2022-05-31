@@ -4,7 +4,7 @@ Establishes Database
 import sqlite3
 import os
 from pathlib import Path
-from Custom_Logging.logger import CustLogger
+from custom_logging.logger import CustLogger
 
 # pylint: disable=W0703
 
