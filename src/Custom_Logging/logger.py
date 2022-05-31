@@ -14,7 +14,7 @@ class CustLogger:
         self.logger = logging.getLogger(name)
         self.logger.setLevel(log_level)
         # create file handler and set the log level
-        file_holder = logging.FileHandler("logging_file/logFile.log")
+        file_holder = logging.FileHandler("src/log_file.log")
         # create formater
         formatter = logging.Formatter('%(asctime)s '
                                       '- %(levelname)s '
