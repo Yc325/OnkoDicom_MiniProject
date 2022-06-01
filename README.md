@@ -33,7 +33,7 @@ Run:
 ```pycodestyle --show-source --show-pep8 src/```
 
 To check what coverage we have on our project with testing we can run:
-```pytest --cov=src/models --cov=src/controllers --cov=src/main.py --cov=src/views```
+```pytest --cov=src```
 
 -Ideally we would like to maintain minimum 85% coverage, so as you add code, try add tests.
 
