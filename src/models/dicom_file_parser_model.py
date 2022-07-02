@@ -58,7 +58,7 @@ class DicomFileModel:
         logging_display.logger.info('get_body_part_title function called')
         return self.body_part_title
 
-    def get_qtimage(self):
+    def get_pil_image(self):
         """Gets the qt_image"""
         # display logging info
         logging_display.logger.info('get_qtimage function called')
@@ -72,7 +72,7 @@ class DicomFileModel:
         final_image = np.uint8(rescaled_im)
         pillow_image = Image.fromarray(final_image)
 
-        return ImageQt.ImageQt(pillow_image)
+        return pillow_image
 
     # move this function somewhere more relevent
     def get_type(self):

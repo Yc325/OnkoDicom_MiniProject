@@ -40,5 +40,3 @@ if __name__ == '__main__':
     # warning
     # logging_display.logger.warning("Warning")
     app = App(sys.argv)
-    app.exec()
-    sys.exit(app.exec_())

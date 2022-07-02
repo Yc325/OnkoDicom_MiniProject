@@ -1,19 +1,10 @@
 """Established MainView class"""
 import os
+import tkinter as tk
+from tkinter import ttk
+from views.image_window import ImageWindow
+from os.path import dirname
 
-from PySide6.QtWidgets import (
-    QLabel,
-    QMainWindow,
-    QPushButton,
-    QWidget,
-    QGridLayout,
-    QHBoxLayout,
-    QTableWidgetItem,
-    QTableWidget,
-    QAbstractItemView,
-    QHeaderView,
-    QLineEdit,
-)
 # pylint: disable = E1101
 from custom_logging.logger import CustLogger
 
@@ -21,7 +12,7 @@ from custom_logging.logger import CustLogger
 logging_display = CustLogger(name=__name__)
 
 
-class MainView(QMainWindow):
+class MainView():
     """
     Handles main window (UI) displayed to user
     """
@@ -32,66 +23,69 @@ class MainView(QMainWindow):
         self._model = model
         self._main_controller = main_controller
 
+        # set window title + window size
+        self.root_window = tk.Tk()
+        self.root_window.geometry("600x600")
+        self.root_window.title('View DICOM files')
+
+        # configure the grid
+        # self.root_window.columnconfigure(0, weight=1)
+        # self.root_window.columnconfigure(1, weight=5)
+        # self.root_window.columnconfigure(2, weight=1)
+
+        # directory label: "In directory"
+        directory_label = ttk.Label(self.root_window, text="In directory:")
+        directory_label.grid(column=0, row=0, sticky=tk.W, padx=5, pady=5)
+
+        # directory text input
+        directory_input = ttk.Entry(self.root_window, width=45)
+        directory_input.grid(column=1, row=0, sticky=tk.E, padx=5, pady=5)
+
         # directory search button
-        self.browse_files_button = QPushButton("&Change...")
-        self.browse_files_button.clicked.connect(
-            self._main_controller.browse_for_dicom_file_directory)
+        dir_search_button = ttk.Button(self.root_window, text="Change...", command=self._main_controller.browse_for_dicom_file_directory)
+        dir_search_button.grid(column=2, row=0, sticky=tk.E, padx=5, pady=5)
 
-        directory_input_text = QLineEdit()
-        # directory_input_text.setText(QDir.currentPath())
-        # comboBox.setSizePolicy(QSizePolicy.Expanding,
-        #                        QSizePolicy.Preferred)
+        btn = ttk.Button(self.root_window,
+             text ="Click to open image window")
 
-        self.directory_input_text = directory_input_text
+        parent_directory = dirname(__file__).split("\\src")[0]
+        image_path = f"{parent_directory}\\dicom_file\\CT_183_Hashed.dcm"
+        self._main_controller.change_selected_image_file_path(image_path)
 
-        directory_label = QLabel("In directory:")
-        self.files_found_label = QLabel()
+        btn.bind("<Button>",
+                lambda e: self._main_controller.change_selected_image_file_path(image_path)
+                )
 
-        self.files_table = QTableWidget(0, 2)
-        self.files_table.setSelectionBehavior(QAbstractItemView.SelectRows)
-        self.files_table.setHorizontalHeaderLabels(("File Name", "Size", None))
-        self.files_table.horizontalHeader().setSectionResizeMode(
-            0,
-            QHeaderView.Stretch
-        )
-        # self.files_table.verticalHeader().hide()
-        # self.files_table.hideColumn(2) #hide column
-        self.files_table.setShowGrid(False)
-
-        buttons_layout = QHBoxLayout()
-        buttons_layout.addStretch()
+        btn.grid(column=1, row=1)
 
         # Create GRID LAYOUT
-        main_layout = QGridLayout()
-        main_layout.addWidget(directory_label, 2, 0)
-        main_layout.addWidget(self.directory_input_text, 2, 1)
-        main_layout.addWidget(self.browse_files_button, 2, 2)
-        main_layout.addWidget(self.files_table, 3, 0, 1, 3)
-        main_layout.addWidget(self.files_found_label, 4, 0)
-        main_layout.addLayout(buttons_layout, 5, 0, 1, 3)
-
-        container = QWidget()
-        container.setLayout(main_layout)
-        self.setWindowTitle("Explore DICOM Files")
-        self.resize(600, 600)
-        self.setCentralWidget(container)
+        # main_layout = QGridLayout()
+        # main_layout.addWidget(directory_label, 2, 0)
+        # main_layout.addWidget(self.directory_input_text, 2, 1)
+        # main_layout.addWidget(self.browse_files_button, 2, 2)
+        # main_layout.addWidget(self.files_table, 3, 0, 1, 3)
+        # main_layout.addWidget(self.files_found_label, 4, 0)
+        # main_layout.addLayout(buttons_layout, 5, 0, 1, 3)
 
         # connect widgets to controller
-        self.directory_input_text.textChanged.connect(
-            self._main_controller.change_selected_dicom_directory
-        )
+        # self.directory_input_text.textChanged.connect(
+        #     self._main_controller.change_selected_dicom_directory
+        # )
         # rather than calling the main_controller directly
         # an intermittent function is required to get/present the data
-        self.files_table.cellClicked.connect(self.select_image_file)
+        # self.files_table.cellClicked.connect(self.select_image_file)
 
         # listen for model event signals
         # listening for change in selected directory
-        self._model.selected_dicom_directory_changed.connect(
-            self.on_selected_dicom_directory_changed
-        )
+        # self._model.selected_dicom_directory_changed.connect(
+        #     self.on_selected_dicom_directory_changed
+        # )
 
         # checks for default directory preference in config db
         self._main_controller.check_preference()
+
+    def show(self):
+        self.root_window.mainloop()
 
     def on_selected_dicom_directory_changed(self, path):
         """
