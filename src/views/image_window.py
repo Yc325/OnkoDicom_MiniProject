@@ -28,11 +28,13 @@ class ImageWindow(Toplevel):
         self._model = model
         self._main_controller = main_controller
 
-        self.image_window = Canvas(self, width=700,height=700)
-        # self.image_title_label = Label(self)
-        # self.image_number = Label(self)
+        self.image_window = Canvas(self, width=600,height=600)
+        self.image_title_label = Label(self)
+        self.image_number = Label(self)
 
         self.image_window.pack()
+        self.image_title_label.pack()
+        self.image_number.pack()
 
         self.show_data()
 
@@ -69,11 +71,7 @@ class ImageWindow(Toplevel):
         self.image = ImageTk.PhotoImage(self.pil_image)
         self.image_window.create_image(300,300,image=self.image)
 
-        # self.image_window.setPixmap(
-        #     QtGui.QPixmap.fromImage(dicom_file_parser.get_qtimage())
-        #     )
-
-        # self.image_title_label.setText(
-        #     f'Body Part: {dicom_file_parser.get_body_part_title()}')
-        # self.image_number.setText(
-        #     f'IMG # {dicom_file_parser.get_instance_number()}')
+        self.image_title_label.config(text =
+            f'Body Part: {dicom_file_parser.get_body_part_title()}')
+        self.image_number.config(text=
+            f'IMG # {dicom_file_parser.get_instance_number()}')

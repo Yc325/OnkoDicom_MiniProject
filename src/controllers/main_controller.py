@@ -87,7 +87,6 @@ class MainController(QObject):
         changes the selected image file path
         """
 
-        print('test')
         # display logging info
         logging_display.logger.info('change_selected_image_file_path'
                                     ' function called')
